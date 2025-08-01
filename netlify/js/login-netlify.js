@@ -1,6 +1,7 @@
 // ==================== CONFIGURAÇÃO API ====================
 // Configure o URL da sua API no backend (Google Cloud, Heroku, etc.)
-const API_BASE_URL = 'https://sua-api-backend.herokuapp.com'; // ALTERE AQUI
+const API_BASE_URL = 'http://localhost:3000'; // Para desenvolvimento local
+// const API_BASE_URL = 'https://sua-api-sala-livre.appspot.com'; // Para produção Google Cloud
 
 // ==================== VARIÁVEIS GLOBAIS ====================
 let currentTab = 'login';
