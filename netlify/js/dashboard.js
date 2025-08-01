@@ -736,18 +736,32 @@ function createReportForm() {
 }
 
 function createEventDetails(event) {
+    const startDate = event.start.toLocaleDateString('pt-BR');
+    const startTime = event.start.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
+    const endTime = event.end ? event.end.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'}) : 'Não definido';
+    
+    const room = event.extendedProps?.room || 'Sala não especificada';
+    const organizer = event.extendedProps?.organizer || 'Organizador não definido';
+    const description = event.extendedProps?.description || 'Sem descrição';
+    const originalTitle = event.extendedProps?.originalTitle || event.title;
+    
     return `
         <div class="event-details">
-            <h4>${event.title}</h4>
+            <h4>${originalTitle}</h4>
             <div class="event-info">
-                <p><i class="fas fa-calendar"></i> ${event.start.toLocaleDateString('pt-BR')}</p>
-                <p><i class="fas fa-clock"></i> ${event.start.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})} - ${event.end.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})}</p>
-                <p><i class="fas fa-door-open"></i> Sala Alpha</p>
-                <p><i class="fas fa-user"></i> João Silva</p>
+                <p><i class="fas fa-calendar"></i> ${startDate}</p>
+                <p><i class="fas fa-clock"></i> ${startTime} - ${endTime}</p>
+                <p><i class="fas fa-door-open"></i> ${room}</p>
+                <p><i class="fas fa-user"></i> ${organizer}</p>
+                ${description !== 'Sem descrição' ? `<p><i class="fas fa-info-circle"></i> ${description}</p>` : ''}
             </div>
             <div class="event-actions">
-                <button class="btn-secondary">Editar</button>
-                <button class="btn-secondary" style="color: var(--secondary-color);">Cancelar</button>
+                <button class="btn-secondary" onclick="editEvent('${event.id}')">
+                    <i class="fas fa-edit"></i> Editar
+                </button>
+                <button class="btn-secondary" onclick="deleteEvent('${event.id}')" style="color: var(--secondary-color);">
+                    <i class="fas fa-trash"></i> Cancelar
+                </button>
             </div>
         </div>
     `;
@@ -778,14 +792,175 @@ function handleFormSubmit(e) {
     
     console.log('Form submitted:', data);
     
-    // Aqui você faria a chamada para a API
     showLoading();
     
+    // Verificar tipo de formulário
+    if (e.target.id === 'bookingForm' || e.target.id === 'quickBookingForm') {
+        handleBookingSubmission(data);
+    } else if (e.target.id === 'editBookingForm') {
+        const eventId = e.target.getAttribute('data-event-id');
+        handleEditBookingSubmission(data, eventId);
+    } else {
+        // Outras ações
+        setTimeout(() => {
+            hideLoading();
+            closeModal();
+            showNotification('Operação realizada com sucesso!', 'success');
+        }, 1000);
+    }
+}
+
+function handleBookingSubmission(data) {
+    // Validar dados obrigatórios
+    if (!data.title || !data.date || !data.startTime || !data.endTime || !data.room) {
+        hideLoading();
+        showNotification('Por favor, preencha todos os campos obrigatórios.', 'error');
+        return;
+    }
+    
+    // Validar horários
+    if (data.startTime >= data.endTime) {
+        hideLoading();
+        showNotification('O horário de início deve ser anterior ao horário de fim.', 'error');
+        return;
+    }
+    
+    // Verificar disponibilidade da sala
+    const requestedStart = new Date(`${data.date}T${data.startTime}:00`);
+    const requestedEnd = new Date(`${data.date}T${data.endTime}:00`);
+    
+    const conflicts = calendar.getEvents().filter(event => {
+        // Verificar se é a mesma sala
+        if (event.extendedProps.roomId !== data.room) return false;
+        
+        // Verificar sobreposição de horários
+        const eventStart = new Date(event.start);
+        const eventEnd = new Date(event.end);
+        
+        return (requestedStart < eventEnd && requestedEnd > eventStart);
+    });
+    
+    if (conflicts.length > 0) {
+        hideLoading();
+        const conflictEvent = conflicts[0];
+        const conflictTime = `${conflictEvent.start.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})} - ${conflictEvent.end.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})}`;
+        showNotification(`Conflito de horário! Esta sala já está reservada das ${conflictTime}.`, 'error');
+        return;
+    }
+    
+    // Criar evento para o calendário
+    const startDateTime = `${data.date}T${data.startTime}:00`;
+    const endDateTime = `${data.date}T${data.endTime}:00`;
+    
+    // Obter nome da sala
+    const roomNames = {
+        '1': 'Sala Alpha',
+        '2': 'Sala Beta', 
+        '3': 'Sala Gamma',
+        '4': 'Sala Delta'
+    };
+    
+    const roomName = roomNames[data.room] || 'Sala Desconhecida';
+    
+    // Criar novo evento
+    const newEvent = {
+        id: Date.now().toString(), // ID único baseado em timestamp
+        title: `${data.title} - ${roomName}`,
+        start: startDateTime,
+        end: endDateTime,
+        backgroundColor: getRandomEventColor(),
+        borderColor: getRandomEventColor(),
+        extendedProps: {
+            room: roomName,
+            roomId: data.room,
+            description: data.description || '',
+            organizer: currentUser ? currentUser.name : 'Usuário',
+            originalTitle: data.title
+        }
+    };
+    
+    // Adicionar evento ao calendário
+    if (calendar) {
+        calendar.addEvent(newEvent);
+        console.log('Evento adicionado ao calendário:', newEvent);
+    }
+    
+    // Atualizar atividade recente
+    addRecentActivity({
+        icon: 'fa-calendar-plus',
+        title: `Nova reserva: ${data.title} - ${roomName}`,
+        meta: `${currentUser ? currentUser.name : 'Usuário'} • agora`,
+        color: 'var(--primary-color)'
+    });
+    
+    // Atualizar KPIs
+    updateKPIAfterBooking();
+    
+    // Simular salvamento na API (em produção, fazer chamada real)
     setTimeout(() => {
         hideLoading();
         closeModal();
-        showNotification('Operação realizada com sucesso!', 'success');
+        showNotification(`Reserva "${data.title}" criada com sucesso para ${formatDate(data.date)} das ${data.startTime} às ${data.endTime}!`, 'success');
+        
+        // Se estivermos na seção do calendário, garantir que está visível
+        if (document.getElementById('calendar-section').classList.contains('active')) {
+            calendar.render();
+        }
     }, 1000);
+}
+
+function getRandomEventColor() {
+    const colors = [
+        'var(--primary-color)',
+        'var(--accent-color)', 
+        'var(--secondary-color)',
+        '#f59e0b',
+        '#8b5cf6',
+        '#06b6d4'
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('pt-BR');
+}
+
+function addRecentActivity(activity) {
+    const activityList = document.getElementById('activityList');
+    const newActivityHTML = `
+        <div class="activity-item">
+            <div class="activity-icon" style="background-color: ${activity.color}">
+                <i class="fas ${activity.icon}"></i>
+            </div>
+            <div class="activity-content">
+                <div class="activity-title">${activity.title}</div>
+                <div class="activity-meta">${activity.meta}</div>
+            </div>
+        </div>
+    `;
+    
+    // Adicionar no topo da lista
+    activityList.insertAdjacentHTML('afterbegin', newActivityHTML);
+    
+    // Remover atividades antigas se houver muitas (manter máximo 5)
+    const activities = activityList.querySelectorAll('.activity-item');
+    if (activities.length > 5) {
+        activities[activities.length - 1].remove();
+    }
+}
+
+function updateKPIAfterBooking() {
+    // Incrementar reservas de hoje
+    const todayBookingsElement = document.getElementById('todayBookings');
+    const currentBookings = parseInt(todayBookingsElement.textContent);
+    todayBookingsElement.textContent = currentBookings + 1;
+    
+    // Simular atualização da taxa de ocupação
+    const occupancyElement = document.getElementById('occupancyRate');
+    const currentOccupancy = parseInt(occupancyElement.textContent);
+    const newOccupancy = Math.min(100, currentOccupancy + Math.floor(Math.random() * 5));
+    occupancyElement.textContent = newOccupancy + '%';
 }
 
 // ==================== UTILITY FUNCTIONS ====================
@@ -852,3 +1027,161 @@ setInterval(() => {
     loadKPIs();
     loadRecentActivity();
 }, 60000); // Atualizar a cada minuto
+
+// ==================== EVENT MANAGEMENT ====================
+function editEvent(eventId) {
+    const event = calendar.getEventById(eventId);
+    if (!event) {
+        showNotification('Evento não encontrado.', 'error');
+        return;
+    }
+    
+    // Extrair dados do evento para preencher o formulário
+    const eventData = {
+        title: event.extendedProps.originalTitle || event.title,
+        date: event.start.toISOString().split('T')[0],
+        startTime: event.start.toLocaleTimeString('en-GB', {hour: '2-digit', minute: '2-digit'}),
+        endTime: event.end ? event.end.toLocaleTimeString('en-GB', {hour: '2-digit', minute: '2-digit'}) : '',
+        room: event.extendedProps.roomId || '',
+        description: event.extendedProps.description || ''
+    };
+    
+    // Fechar modal atual
+    closeModal();
+    
+    // Abrir modal de edição
+    setTimeout(() => {
+        openModal('Editar Reserva', createEditBookingForm(eventData, eventId));
+    }, 100);
+}
+
+function deleteEvent(eventId) {
+    if (confirm('Tem certeza que deseja cancelar esta reserva?')) {
+        const event = calendar.getEventById(eventId);
+        if (event) {
+            const eventTitle = event.extendedProps.originalTitle || event.title;
+            event.remove();
+            
+            // Adicionar à atividade recente
+            addRecentActivity({
+                icon: 'fa-calendar-times',
+                title: `Reserva cancelada: ${eventTitle}`,
+                meta: `${currentUser ? currentUser.name : 'Usuário'} • agora`,
+                color: 'var(--secondary-color)'
+            });
+            
+            // Atualizar KPIs
+            const todayBookingsElement = document.getElementById('todayBookings');
+            const currentBookings = parseInt(todayBookingsElement.textContent);
+            todayBookingsElement.textContent = Math.max(0, currentBookings - 1);
+            
+            closeModal();
+            showNotification('Reserva cancelada com sucesso!', 'success');
+        }
+    }
+}
+
+function createEditBookingForm(eventData, eventId) {
+    return `
+        <form id="editBookingForm" class="modal-form" data-event-id="${eventId}">
+            <div class="form-group">
+                <label for="editBookingTitle">Título da Reunião</label>
+                <input type="text" id="editBookingTitle" name="title" value="${eventData.title}" required>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="editBookingDate">Data</label>
+                    <input type="date" id="editBookingDate" name="date" value="${eventData.date}" required>
+                </div>
+                <div class="form-group">
+                    <label for="editBookingRoom">Sala</label>
+                    <select id="editBookingRoom" name="room" required>
+                        <option value="">Selecione uma sala</option>
+                        <option value="1" ${eventData.room === '1' ? 'selected' : ''}>Sala Alpha</option>
+                        <option value="2" ${eventData.room === '2' ? 'selected' : ''}>Sala Beta</option>
+                        <option value="3" ${eventData.room === '3' ? 'selected' : ''}>Sala Gamma</option>
+                        <option value="4" ${eventData.room === '4' ? 'selected' : ''}>Sala Delta</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="editBookingStartTime">Início</label>
+                    <input type="time" id="editBookingStartTime" name="startTime" value="${eventData.startTime}" required>
+                </div>
+                <div class="form-group">
+                    <label for="editBookingEndTime">Fim</label>
+                    <input type="time" id="editBookingEndTime" name="endTime" value="${eventData.endTime}" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="editBookingDescription">Descrição</label>
+                <textarea id="editBookingDescription" name="description" rows="3">${eventData.description}</textarea>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" onclick="closeModal()">Cancelar</button>
+                <button type="submit" class="btn-primary">Salvar Alterações</button>
+            </div>
+        </form>
+    `;
+}
+
+function handleEditBookingSubmission(data, eventId) {
+    // Validar dados
+    if (!data.title || !data.date || !data.startTime || !data.endTime || !data.room) {
+        hideLoading();
+        showNotification('Por favor, preencha todos os campos obrigatórios.', 'error');
+        return;
+    }
+    
+    if (data.startTime >= data.endTime) {
+        hideLoading();
+        showNotification('O horário de início deve ser anterior ao horário de fim.', 'error');
+        return;
+    }
+    
+    // Encontrar e atualizar evento
+    const event = calendar.getEventById(eventId);
+    if (event) {
+        const roomNames = {
+            '1': 'Sala Alpha',
+            '2': 'Sala Beta', 
+            '3': 'Sala Gamma',
+            '4': 'Sala Delta'
+        };
+        
+        const roomName = roomNames[data.room];
+        const startDateTime = `${data.date}T${data.startTime}:00`;
+        const endDateTime = `${data.date}T${data.endTime}:00`;
+        
+        // Atualizar propriedades do evento
+        event.setProp('title', `${data.title} - ${roomName}`);
+        event.setStart(startDateTime);
+        event.setEnd(endDateTime);
+        event.setExtendedProp('room', roomName);
+        event.setExtendedProp('roomId', data.room);
+        event.setExtendedProp('description', data.description);
+        event.setExtendedProp('originalTitle', data.title);
+        
+        // Adicionar à atividade recente
+        addRecentActivity({
+            icon: 'fa-edit',
+            title: `Reserva atualizada: ${data.title} - ${roomName}`,
+            meta: `${currentUser ? currentUser.name : 'Usuário'} • agora`,
+            color: 'var(--accent-color)'
+        });
+        
+        setTimeout(() => {
+            hideLoading();
+            closeModal();
+            showNotification(`Reserva "${data.title}" atualizada com sucesso!`, 'success');
+        }, 500);
+    } else {
+        hideLoading();
+        showNotification('Erro: Evento não encontrado.', 'error');
+    }
+}

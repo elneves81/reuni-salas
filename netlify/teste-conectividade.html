@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Conectividade - Sala Livre</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            color: white;
+        }
+        .test-container {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 90%;
+        }
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        h1 {
+            margin-bottom: 1rem;
+        }
+        .status {
+            font-size: 1.2rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+        }
+        .btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            background: white;
+            color: #22c55e;
+        }
+        .error {
+            background: rgba(239, 68, 68, 0.2);
+            border-left: 4px solid #ef4444;
+        }
+        .success {
+            background: rgba(34, 197, 94, 0.2);
+            border-left: 4px solid #22c55e;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="logo">🏢</div>
+        <h1>Sala Livre - Teste de Conectividade</h1>
+        
+        <div class="status success">
+            ✅ Página Local Carregada com Sucesso
+        </div>
+        
+        <div class="status" id="netlifyStatus">
+            🔄 Testando conexão com Netlify...
+        </div>
+        
+        <div class="status" id="apiStatus">
+            🔄 Testando API Functions...
+        </div>
+        
+        <button class="btn" onclick="testConnections()">🔄 Testar Novamente</button>
+        <button class="btn" onclick="goToDashboard()">📊 Ir para Dashboard</button>
+        
+        <div style="margin-top: 2rem; font-size: 0.9rem; opacity: 0.8;">
+            <p><strong>Se você está vendo esta página:</strong></p>
+            <p>✅ Seu navegador está funcionando</p>
+            <p>✅ JavaScript está habilitado</p>
+            <p>✅ Arquivos locais são acessíveis</p>
+        </div>
+    </div>
+
+    <script>
+        async function testConnections() {
+            // Test Netlify site
+            const netlifyStatus = document.getElementById('netlifyStatus');
+            netlifyStatus.innerHTML = '🔄 Testando Netlify...';
+            
+            try {
+                const response = await fetch('https://salalivre.netlify.app/', { 
+                    method: 'GET',
+                    mode: 'no-cors' // Avoid CORS issues
+                });
+                netlifyStatus.innerHTML = '✅ Netlify: Conexão Estabelecida';
+                netlifyStatus.className = 'status success';
+            } catch (error) {
+                netlifyStatus.innerHTML = `❌ Netlify: ${error.message}`;
+                netlifyStatus.className = 'status error';
+            }
+            
+            // Test API
+            const apiStatus = document.getElementById('apiStatus');
+            apiStatus.innerHTML = '🔄 Testando API...';
+            
+            try {
+                const response = await fetch('https://salalivre.netlify.app/.netlify/functions/test');
+                if (response.ok) {
+                    apiStatus.innerHTML = '✅ API: Funcionando';
+                    apiStatus.className = 'status success';
+                } else {
+                    apiStatus.innerHTML = `⚠️ API: HTTP ${response.status}`;
+                    apiStatus.className = 'status error';
+                }
+            } catch (error) {
+                apiStatus.innerHTML = `❌ API: ${error.message}`;
+                apiStatus.className = 'status error';
+            }
+        }
+        
+        function goToDashboard() {
+            window.open('https://salalivre.netlify.app', '_blank');
+        }
+        
+        // Auto-test on load
+        window.addEventListener('load', testConnections);
+    </script>
+</body>
+</html>
