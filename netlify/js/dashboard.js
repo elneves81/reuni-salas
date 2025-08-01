@@ -407,8 +407,45 @@ function initializeCalendar() {
         },
         dateClick: function(info) {
             openModal('Nova Reserva', createBookingForm(info.dateStr));
+        },
+        datesSet: function(info) {
+            // Atualizar o título do mês sempre que as datas mudarem
+            updateCalendarTitle(info.start);
         }
     });
+    
+    // Inicializar navegação do calendário
+    initCalendarNavigation();
+}
+
+function initCalendarNavigation() {
+    // Botão mês anterior
+    document.getElementById('prevMonth').addEventListener('click', () => {
+        calendar.prev();
+    });
+    
+    // Botão próximo mês
+    document.getElementById('nextMonth').addEventListener('click', () => {
+        calendar.next();
+    });
+    
+    // Atualizar título inicial
+    updateCalendarTitle(new Date());
+}
+
+function updateCalendarTitle(date) {
+    const monthNames = [
+        'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ];
+    
+    const month = monthNames[date.getMonth()];
+    const year = date.getFullYear();
+    
+    const titleElement = document.getElementById('currentMonth');
+    if (titleElement) {
+        titleElement.textContent = `${month} ${year}`;
+    }
 }
 
 function handleViewChange(e) {
