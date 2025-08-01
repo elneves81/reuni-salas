@@ -337,7 +337,7 @@ function handleGoogleSignInResponse(response) {
             
             // Redirecionar após 2 segundos para o dashboard
             setTimeout(() => {
-                window.location.href = `${API_BASE_URL}/dashboard`;
+                window.location.href = '/dashboard.html';
             }, 2000);
         } else {
             showModal('Erro', data.message || 'Erro ao fazer login com Google', 'error');
@@ -407,9 +407,9 @@ function handleLogin(e) {
             
             showModal('Sucesso!', 'Login realizado com sucesso!', 'success');
             
-            // Redirecionar
+            // Redirecionar para dashboard (não através das functions)
             setTimeout(() => {
-                window.location.href = `${API_BASE_URL}/dashboard`;
+                window.location.href = '/dashboard.html';
             }, 2000);
         } else {
             showModal('Erro', result.message || 'Credenciais inválidas', 'error');
@@ -592,7 +592,7 @@ function checkSavedToken() {
         .then(result => {
             if (result.valid) {
                 // Token válido, redirecionar para dashboard
-                window.location.href = `${API_BASE_URL}/dashboard`;
+                window.location.href = '/dashboard.html';
             } else {
                 // Token inválido, remover do localStorage
                 localStorage.removeItem('authToken');

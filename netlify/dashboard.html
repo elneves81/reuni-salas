@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sala Livre - Dashboard Executivo</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-calendar-check"></i>
+                <h2>Sala Livre</h2>
+            </div>
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <nav class="sidebar-nav">
+            <ul>
+                <li class="nav-item active">
+                    <a href="#" data-section="dashboard">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" data-section="calendar">
+                        <i class="fas fa-calendar"></i>
+                        <span>Calendário</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" data-section="rooms">
+                        <i class="fas fa-door-open"></i>
+                        <span>Salas</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" data-section="bookings">
+                        <i class="fas fa-bookmark"></i>
+                        <span>Reservas</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" data-section="users">
+                        <i class="fas fa-users"></i>
+                        <span>Usuários</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" data-section="reports">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Relatórios</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" data-section="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Configurações</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-details">
+                    <span class="user-name" id="userName">Administrador</span>
+                    <span class="user-role" id="userRole">Admin</span>
+                </div>
+            </div>
+            <button class="logout-btn" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="header-left">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title" id="pageTitle">Dashboard Executivo</h1>
+            </div>
+            <div class="header-right">
+                <div class="header-actions">
+                    <button class="header-btn" id="notificationsBtn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    <button class="header-btn" id="quickAddBtn">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <div class="user-menu">
+                        <button class="user-menu-toggle" id="userMenuToggle">
+                            <img src="https://via.placeholder.com/40" alt="User" class="user-avatar-small">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="user-menu-dropdown" id="userMenuDropdown">
+                            <a href="#"><i class="fas fa-user"></i> Perfil</a>
+                            <a href="#"><i class="fas fa-cog"></i> Configurações</a>
+                            <hr>
+                            <a href="#" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Sair</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Dashboard Section -->
+            <section id="dashboard-section" class="content-section active">
+                <!-- KPI Cards -->
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <h3>Salas Disponíveis</h3>
+                            <i class="fas fa-door-open kpi-icon"></i>
+                        </div>
+                        <div class="kpi-value" id="availableRooms">8</div>
+                        <div class="kpi-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+2 desde ontem</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <h3>Reservas Hoje</h3>
+                            <i class="fas fa-calendar-day kpi-icon"></i>
+                        </div>
+                        <div class="kpi-value" id="todayBookings">12</div>
+                        <div class="kpi-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+15% vs ontem</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <h3>Taxa de Ocupação</h3>
+                            <i class="fas fa-chart-pie kpi-icon"></i>
+                        </div>
+                        <div class="kpi-value" id="occupancyRate">76%</div>
+                        <div class="kpi-change negative">
+                            <i class="fas fa-arrow-down"></i>
+                            <span>-5% vs semana passada</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <h3>Usuários Ativos</h3>
+                            <i class="fas fa-users kpi-icon"></i>
+                        </div>
+                        <div class="kpi-value" id="activeUsers">45</div>
+                        <div class="kpi-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+8 novos usuários</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="charts-row">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Ocupação por Hora</h3>
+                            <div class="chart-controls">
+                                <select id="occupationPeriod">
+                                    <option value="today">Hoje</option>
+                                    <option value="week">Esta Semana</option>
+                                    <option value="month">Este Mês</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="occupationChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Salas Mais Utilizadas</h3>
+                            <div class="chart-controls">
+                                <button class="chart-btn active" data-period="week">Semana</button>
+                                <button class="chart-btn" data-period="month">Mês</button>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="roomsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity & Quick Actions -->
+                <div class="bottom-row">
+                    <div class="recent-activity-card">
+                        <div class="card-header">
+                            <h3>Atividade Recente</h3>
+                            <button class="view-all-btn">Ver Tudo</button>
+                        </div>
+                        <div class="activity-list" id="activityList">
+                            <!-- Activities will be populated by JS -->
+                        </div>
+                    </div>
+
+                    <div class="quick-actions-card">
+                        <div class="card-header">
+                            <h3>Ações Rápidas</h3>
+                        </div>
+                        <div class="quick-actions-grid">
+                            <button class="quick-action-btn" data-action="new-booking">
+                                <i class="fas fa-plus"></i>
+                                <span>Nova Reserva</span>
+                            </button>
+                            <button class="quick-action-btn" data-action="add-room">
+                                <i class="fas fa-door-open"></i>
+                                <span>Adicionar Sala</span>
+                            </button>
+                            <button class="quick-action-btn" data-action="add-user">
+                                <i class="fas fa-user-plus"></i>
+                                <span>Novo Usuário</span>
+                            </button>
+                            <button class="quick-action-btn" data-action="generate-report">
+                                <i class="fas fa-file-alt"></i>
+                                <span>Gerar Relatório</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Calendar Section -->
+            <section id="calendar-section" class="content-section">
+                <div class="calendar-header">
+                    <div class="calendar-controls">
+                        <button class="btn-secondary" id="prevMonth">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <h3 id="currentMonth">Janeiro 2025</h3>
+                        <button class="btn-secondary" id="nextMonth">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="view-controls">
+                        <button class="view-btn active" data-view="month">Mês</button>
+                        <button class="view-btn" data-view="week">Semana</button>
+                        <button class="view-btn" data-view="day">Dia</button>
+                    </div>
+                    <button class="btn-primary" id="newEventBtn">
+                        <i class="fas fa-plus"></i>
+                        Nova Reserva
+                    </button>
+                </div>
+                <div id="calendar"></div>
+            </section>
+
+            <!-- Rooms Section -->
+            <section id="rooms-section" class="content-section">
+                <div class="section-header">
+                    <h2>Gerenciamento de Salas</h2>
+                    <button class="btn-primary" id="addRoomBtn">
+                        <i class="fas fa-plus"></i>
+                        Adicionar Sala
+                    </button>
+                </div>
+                
+                <div class="filters-bar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Buscar salas..." id="roomSearch">
+                    </div>
+                    <div class="filter-controls">
+                        <select id="capacityFilter">
+                            <option value="">Todas as Capacidades</option>
+                            <option value="small">Até 5 pessoas</option>
+                            <option value="medium">6-15 pessoas</option>
+                            <option value="large">16+ pessoas</option>
+                        </select>
+                        <select id="statusFilter">
+                            <option value="">Todos os Status</option>
+                            <option value="available">Disponível</option>
+                            <option value="occupied">Ocupada</option>
+                            <option value="maintenance">Manutenção</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="rooms-grid" id="roomsGrid">
+                    <!-- Rooms will be populated by JS -->
+                </div>
+            </section>
+
+            <!-- Other sections will be added here -->
+        </div>
+    </main>
+
+    <!-- Modal for Quick Actions -->
+    <div class="modal" id="actionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Título</h3>
+                <button class="modal-close" id="modalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Dynamic content -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Carregando...</p>
+        </div>
+    </div>
+
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
