@@ -1,15 +1,13 @@
 // ==================== NETLIFY FUNCTION: LOGIN ====================
-const mysql = require('mysql2/promise');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 
 exports.handler = async (event, context) => {
     // Configurar CORS
     const headers = {
-        'Access-Control-Allow-Origin': 'https://salalivre.netlify.app',
+        'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Credentials': 'true'
+        'Access-Control-Allow-Credentials': 'true',
+        'Content-Type': 'application/json'
     };
 
     // Responder a OPTIONS (preflight)
@@ -30,7 +28,14 @@ exports.handler = async (event, context) => {
     }
 
     try {
+        // Importar dependências dentro da function
+        const mysql = require('mysql2/promise');
+        const bcrypt = require('bcryptjs');
+        const jwt = require('jsonwebtoken');
+
         const { email, password } = JSON.parse(event.body);
+
+        console.log('Login attempt for:', email);
 
         // Conectar ao banco Google Cloud SQL
         const connection = await mysql.createConnection({
@@ -38,8 +43,11 @@ exports.handler = async (event, context) => {
             user: 'app_user',
             password: 'Neves@2025',
             database: 'sala_livre',
-            port: 3306
+            port: 3306,
+            connectTimeout: 10000
         });
+
+        console.log('Database connected');
 
         // Buscar usuário
         const [users] = await connection.execute(
@@ -60,6 +68,7 @@ exports.handler = async (event, context) => {
         }
 
         const user = users[0];
+        console.log('User found:', user.name);
 
         // Verificar senha
         const isMatch = await bcrypt.compare(password, user.password);
@@ -98,6 +107,8 @@ exports.handler = async (event, context) => {
         // Remover senha do retorno
         delete user.password;
 
+        console.log('Login successful for:', user.email);
+
         return {
             statusCode: 200,
             headers,
@@ -110,13 +121,13 @@ exports.handler = async (event, context) => {
         };
 
     } catch (error) {
-        console.error('Erro no login:', error);
+        console.error('Login error:', error);
         return {
             statusCode: 500,
             headers,
             body: JSON.stringify({ 
                 success: false, 
-                message: 'Erro interno do servidor' 
+                message: 'Erro interno: ' + error.message
             })
         };
     }

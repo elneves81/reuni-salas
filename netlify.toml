@@ -16,14 +16,37 @@
 
 # Redirecionamentos e regras
 [[redirects]]
-  # API Routes para functions
+  # Login function (simples)
+  from = "/login"
+  to = "/.netlify/functions/login-simple"
+  status = 200
+
+[[redirects]]
+  # Register function
+  from = "/register"
+  to = "/.netlify/functions/register"
+  status = 200
+
+[[redirects]]
+  # Test function
+  from = "/test"
+  to = "/.netlify/functions/test"
+  status = 200
+
+[[redirects]]
+  # Legacy API routes
   from = "/api/auth/login"
-  to = "/.netlify/functions/login"
+  to = "/.netlify/functions/login-simple"
   status = 200
 
 [[redirects]]
   from = "/api/auth/register"
   to = "/.netlify/functions/register"
+  status = 200
+
+[[redirects]]
+  from = "/.netlify/functions/login"
+  to = "/.netlify/functions/login-simple"
   status = 200
 
 [[redirects]]

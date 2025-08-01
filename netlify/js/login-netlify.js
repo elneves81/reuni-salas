@@ -1,7 +1,6 @@
 // ==================== CONFIGURAÇÃO API ====================
 // Configure o URL da sua API no backend
 const API_BASE_URL = 'https://salalivre.netlify.app/.netlify/functions'; // Netlify Functions
-// const API_BASE_URL = 'https://sua-api-sala-livre.appspot.com'; // Google Cloud
 // const API_BASE_URL = 'http://localhost:3000'; // Desenvolvimento local
 
 // ==================== VARIÁVEIS GLOBAIS ====================
@@ -380,14 +379,19 @@ function handleLogin(e) {
     
     showLoading();
     
-    fetch(`${API_BASE_URL}/api/auth/login`, {
+    fetch(`${API_BASE_URL}/login`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(data)
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
     .then(result => {
         hideLoading();
         
@@ -451,14 +455,19 @@ function handleRegister(e) {
     
     showLoading();
     
-    fetch(`${API_BASE_URL}/api/auth/register`, {
+    fetch(`${API_BASE_URL}/register`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(data)
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
     .then(result => {
         hideLoading();
         
