@@ -7,7 +7,9 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "setup-db": "node setup/database.js",
-    "test-db": "node test-google-cloud.js"
+    "setup-google": "node setup-google.js",
+    "test-db": "node test-google-cloud.js",
+    "deploy": "gcloud app deploy"
   },
   "keywords": [
     "agenda",

@@ -1,7 +1,8 @@
 // ==================== CONFIGURAÇÃO API ====================
-// Configure o URL da sua API no backend (Google Cloud, Heroku, etc.)
-const API_BASE_URL = 'http://localhost:3000'; // Para desenvolvimento local
-// const API_BASE_URL = 'https://sua-api-sala-livre.appspot.com'; // Para produção Google Cloud
+// Configure o URL da sua API no backend
+const API_BASE_URL = 'https://salalivre.netlify.app/.netlify/functions'; // Netlify Functions
+// const API_BASE_URL = 'https://sua-api-sala-livre.appspot.com'; // Google Cloud
+// const API_BASE_URL = 'http://localhost:3000'; // Desenvolvimento local
 
 // ==================== VARIÁVEIS GLOBAIS ====================
 let currentTab = 'login';

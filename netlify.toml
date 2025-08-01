@@ -4,6 +4,9 @@
   # Diretório com os arquivos do frontend
   publish = "netlify"
   
+  # Diretório das functions
+  functions = "netlify/functions"
+  
   # Comando de build (não necessário para frontend estático)
   command = "echo 'Frontend estático pronto para deploy'"
 
@@ -12,6 +15,17 @@
   NODE_VERSION = "18"
 
 # Redirecionamentos e regras
+[[redirects]]
+  # API Routes para functions
+  from = "/api/auth/login"
+  to = "/.netlify/functions/login"
+  status = 200
+
+[[redirects]]
+  from = "/api/auth/register"
+  to = "/.netlify/functions/register"
+  status = 200
+
 [[redirects]]
   # SPA fallback - todas as rotas vão para index.html
   from = "/*"
