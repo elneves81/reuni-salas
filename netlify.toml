@@ -1,0 +1,39 @@
+# Netlify Build Configuration
+
+[build]
+  # Diretório com os arquivos do frontend
+  publish = "netlify"
+  
+  # Comando de build (não necessário para frontend estático)
+  command = "echo 'Frontend estático pronto para deploy'"
+
+[build.environment]
+  # Variáveis de ambiente para o frontend
+  NODE_VERSION = "18"
+
+# Redirecionamentos e regras
+[[redirects]]
+  # SPA fallback - todas as rotas vão para index.html
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers de segurança
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    
+# Headers para assets estáticos
+[[headers]]
+  for = "/css/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+    
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"

@@ -1,0 +1,138 @@
+# ==================== NODE.JS ====================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ==================== ENVIRONMENT ====================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ==================== LOGS ====================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# ==================== RUNTIME ====================
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# ==================== COVERAGE ====================
+lib-cov/
+coverage/
+nyc_output/
+.nyc_output/
+
+# ==================== DEPENDENCY DIRECTORIES ====================
+node_modules/
+jspm_packages/
+
+# ==================== TYPESCRIPT ====================
+*.tsbuildinfo
+.tscache/
+
+# ==================== OPTIONAL NPM CACHE ====================
+.npm
+.eslintcache
+
+# ==================== MICROBUNDLE CACHE ====================
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# ==================== OPTIONAL ESLINT CACHE ====================
+.eslintcache
+
+# ==================== PARCEL CACHE ====================
+.cache
+.parcel-cache
+
+# ==================== NEXT.JS ====================
+.next
+
+# ==================== NUXT.JS ====================
+.nuxt
+dist
+
+# ==================== GATSBY ====================
+.cache/
+public
+
+# ==================== VUE ====================
+.vuepress/dist
+
+# ==================== SERVERLESS ====================
+.serverless/
+
+# ==================== FUSEBOX ====================
+.fusebox/
+
+# ==================== DYNAMODB LOCAL ====================
+.dynamodb/
+
+# ==================== TERNJS ====================
+.tern-port
+
+# ==================== SISTEMA OPERACIONAL ====================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ==================== EDITORES ====================
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.swp
+*.swo
+*~
+
+# ==================== IDE ====================
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# ==================== UPLOADS ====================
+public/uploads/
+uploads/
+
+# ==================== BACKUP ====================
+*.backup
+*.bak
+*.tmp
+
+# ==================== MYSQL ====================
+*.sql.backup
+
+# ==================== PRODUCTION BUILD ====================
+build/
+dist/
+
+# ==================== DOCKER ====================
+.dockerignore
+docker-compose.override.yml
+
+# ==================== SSL CERTIFICATES ====================
+*.pem
+*.key
+*.crt
+*.csr
+
+# ==================== LOCAL CONFIG ====================
+config/local.js
+config/local.json

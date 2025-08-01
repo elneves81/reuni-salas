@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demonstração - Reunião Fácil</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #dcfce7 0%, #f9fafb 100%);
+            margin: 0;
+            padding: 20px;
+            color: #374151;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .feature {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-left: 4px solid #22c55e;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+        .feature h3 {
+            margin: 0 0 10px 0;
+            color: #22c55e;
+            font-size: 1.3rem;
+        }
+        .feature p {
+            margin: 0;
+            line-height: 1.6;
+        }
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            background: #22c55e;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 10px 10px 10px 0;
+            transition: transform 0.2s;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+        }
+        .button.secondary {
+            background: #6b7280;
+        }
+        .credentials {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .credentials h4 {
+            margin: 0 0 10px 0;
+            color: #dc2626;
+        }
+        .code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #374151;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        .card h4 {
+            margin: 0 0 10px 0;
+            color: #22c55e;
+        }
+        .steps {
+            counter-reset: step-counter;
+        }
+        .step {
+            counter-increment: step-counter;
+            position: relative;
+            padding-left: 40px;
+            margin-bottom: 20px;
+        }
+        .step::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: #22c55e;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📅 Reunião Fácil</h1>
+            <p>Sistema de Agendamento de Salas - Demonstração</p>
+        </div>
+        
+        <div class="content">
+            <div class="feature">
+                <h3>✅ Aplicação Configurada com Sucesso!</h3>
+                <p>A tela de login do "Reunião Fácil" foi criada com design moderno, cores verde e vermelho, autenticação Google e sistema completo de usuário/senha.</p>
+            </div>
+
+            <div class="credentials">
+                <h4>🔑 Credenciais para Teste</h4>
+                <p><strong>Usuário Administrador:</strong></p>
+                <p>Email: <span class="code">admin@reuniaofacil.com</span></p>
+                <p>Senha: <span class="code">admin123</span></p>
+                <p><small>⚠️ Altere a senha após o primeiro login!</small></p>
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <h4>🎨 Design Implementado</h4>
+                    <p>Interface moderna com cores verde (#22c55e) e vermelho (#ef4444), tipografia Inter e animações suaves.</p>
+                </div>
+                <div class="card">
+                    <h4>🔐 Autenticação</h4>
+                    <p>Login tradicional + Google OAuth, cadastro, recuperação de senha e validação em tempo real.</p>
+                </div>
+                <div class="card">
+                    <h4>🗄️ Banco de Dados</h4>
+                    <p>MySQL com 8 tabelas, hierarquia de usuários, departamentos e sistema de permissões.</p>
+                </div>
+                <div class="card">
+                    <h4>📱 Responsivo</h4>
+                    <p>Design mobile-first, otimizado para todos os dispositivos e tamanhos de tela.</p>
+                </div>
+            </div>
+
+            <h3>🚀 Como Testar a Aplicação</h3>
+            
+            <div class="steps">
+                <div class="step">
+                    <strong>Configure o Banco de Dados</strong><br>
+                    <span class="code">npm run setup-db</span> - Cria todas as tabelas e dados iniciais
+                </div>
+                
+                <div class="step">
+                    <strong>Inicie o Servidor</strong><br>
+                    <span class="code">npm run dev</span> - Modo desenvolvimento com hot-reload
+                </div>
+                
+                <div class="step">
+                    <strong>Acesse a Aplicação</strong><br>
+                    <span class="code">http://localhost:3000</span> - Tela de login do Reunião Fácil
+                </div>
+                
+                <div class="step">
+                    <strong>Teste as Funcionalidades</strong><br>
+                    Login, cadastro, Google OAuth e recuperação de senha
+                </div>
+            </div>
+
+            <h3>📋 Próximos Passos para Produção</h3>
+            
+            <div class="feature">
+                <h3>🔧 Configuração do Google OAuth</h3>
+                <p>1. Acesse o <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a><br>
+                2. Crie credenciais OAuth 2.0<br>
+                3. Configure URLs autorizadas<br>
+                4. Adicione Client ID no arquivo .env</p>
+            </div>
+
+            <div class="feature">
+                <h3>☁️ Deploy no Google Cloud</h3>
+                <p>O sistema está pronto para deploy no Google Cloud Platform com Cloud SQL (MySQL) e App Engine.</p>
+            </div>
+
+            <div class="feature">
+                <h3>📅 Desenvolvimento do Calendário</h3>
+                <p>Próxima etapa: implementar o calendário estilo Google, dashboard administrativo e sistema de reservas.</p>
+            </div>
+
+            <div style="text-align: center; margin-top: 40px;">
+                <a href="/" class="button">🚀 Acessar Login</a>
+                <a href="/dashboard" class="button secondary">📊 Dashboard (em breve)</a>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px; padding-top: 30px; border-top: 1px solid #e5e7eb; color: #6b7280;">
+                <p><strong>Reunião Fácil</strong> - Sistema completo de agendamento de salas</p>
+                <p>Desenvolvido com Node.js, Express, MySQL e muito ❤️</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
