@@ -11,7 +11,7 @@ const dbConfig = {
     multipleStatements: true
 };
 
-const databaseName = process.env.DB_NAME || 'reuniao_facil';
+const databaseName = process.env.DB_NAME || 'sala_livre';
 
 // ==================== SQL PARA CRIAÇÃO DAS TABELAS ====================
 const createDatabaseSQL = `CREATE DATABASE IF NOT EXISTS ${databaseName} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`;
@@ -204,7 +204,7 @@ CREATE TABLE IF NOT EXISTS user_hierarchy (
 const insertInitialDataSQL = `
 -- ==================== USUÁRIO ADMINISTRADOR ====================
 INSERT IGNORE INTO users (id, name, email, password, role, auth_provider, email_verified, active) VALUES 
-(1, 'Administrador', 'admin@reuniaofacil.com', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/UnTDhp/X5j0wWjY6u', 'admin', 'local', TRUE, TRUE);
+(1, 'Administrador', 'admin@salalivre.com', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/UnTDhp/X5j0wWjY6u', 'admin', 'local', TRUE, TRUE);
 
 -- ==================== DEPARTAMENTOS PADRÃO ====================
 INSERT IGNORE INTO departments (id, name, description, manager_id) VALUES 
@@ -224,7 +224,7 @@ INSERT IGNORE INTO rooms (id, name, description, capacity, location, equipment, 
 
 -- ==================== CONFIGURAÇÕES PADRÃO ====================
 INSERT IGNORE INTO settings (key_name, value, description, type, category) VALUES 
-('app_name', 'Reunião Fácil', 'Nome da aplicação', 'string', 'general'),
+('app_name', 'Sala Livre', 'Nome da aplicação', 'string', 'general'),
 ('timezone', 'America/Sao_Paulo', 'Fuso horário padrão', 'string', 'general'),
 ('max_booking_duration', '480', 'Duração máxima de reserva em minutos', 'number', 'booking'),
 ('min_booking_duration', '30', 'Duração mínima de reserva em minutos', 'number', 'booking'),
@@ -279,7 +279,7 @@ async function setupDatabase() {
         console.log('\n📊 Informações de acesso:');
         console.log(`   • Database: ${databaseName}`);
         console.log(`   • Host: ${dbConfig.host}:${dbConfig.port}`);
-        console.log(`   • Usuário Admin: admin@reuniaofacil.com`);
+        console.log(`   • Usuário Admin: admin@salalivre.com`);
         console.log(`   • Senha Admin: admin123 (altere após primeiro login)`);
         console.log('\n🚀 Agora você pode iniciar o servidor com: npm start');
         

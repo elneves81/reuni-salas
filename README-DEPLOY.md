@@ -1,9 +1,9 @@
-# 🚀 Deploy Guide - Reunião Fácil
+# 🚀 Deploy Guide - Sala Livre
 
 ## 📋 Estrutura do Projeto
 
 ```
-reuniao-facil/
+sala-livre/
 ├── netlify/              # Frontend para Netlify
 │   ├── index.html       # Página de login
 │   ├── css/             # Estilos
@@ -39,18 +39,18 @@ cd netlify/
 ### 1. Configurar Google Cloud SQL
 ```bash
 # Criar instância MySQL
-gcloud sql instances create reuniao-facil-db \
+gcloud sql instances create sala-livre-db \
     --database-version=MYSQL_8_0 \
     --tier=db-f1-micro \
     --region=us-central1
 
 # Criar database
-gcloud sql databases create reuniao_facil \
-    --instance=reuniao-facil-db
+gcloud sql databases create sala_livre \
+    --instance=sala-livre-db
 
 # Criar usuário
 gcloud sql users create app_user \
-    --instance=reuniao-facil-db \
+    --instance=sala-livre-db \
     --password=SUA_SENHA_SEGURA
 ```
 
@@ -60,7 +60,7 @@ gcloud sql users create app_user \
 DB_HOST=SEU_IP_CLOUD_SQL
 DB_USER=app_user
 DB_PASSWORD=SUA_SENHA_SEGURA
-DB_NAME=reuniao_facil
+DB_NAME=sala_livre
 GOOGLE_CLIENT_ID=SEU_CLIENT_ID
 GOOGLE_CLIENT_SECRET=SEU_CLIENT_SECRET
 JWT_SECRET=SEU_JWT_SECRET_SUPER_SEGURO
@@ -163,7 +163,7 @@ gcloud app logs tail -s default
 ```bash
 # Commit e push para Git
 git add netlify/
-git commit -m "Deploy frontend Reunião Fácil"
+git commit -m "Deploy frontend Sala Livre"
 git push origin main
 
 # Netlify fará deploy automático
@@ -204,8 +204,8 @@ Em caso de problemas:
 
 ---
 
-🎉 **Seu sistema Reunião Fácil estará online!**
+🎉 **Seu sistema Sala Livre estará online!**
 
 - **Frontend**: https://seu-site.netlify.app
 - **Backend**: https://sua-api.appspot.com
-- **Admin**: admin@reuniaofacil.com / admin123
+- **Admin**: admin@salalivre.com / admin123

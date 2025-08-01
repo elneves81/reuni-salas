@@ -1,4 +1,4 @@
-# 📅 Reunião Fácil
+# 📅 Sala Livre
 
 Sistema completo de agendamento de salas de reuniões com hierarquia de usuários, dashboard administrativo e calendário interativo.
 

@@ -1,7 +1,7 @@
 {
-  "name": "reuniao-facil",
+  "name": "sala-livre",
   "version": "1.0.0",
-  "description": "Reunião Fácil - Sistema de Agenda de Salas com Hierarquia de Usuários",
+  "description": "Sala Livre - Sistema de Agenda de Salas com Hierarquia de Usuários",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

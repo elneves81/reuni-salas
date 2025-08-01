@@ -8,7 +8,7 @@ const testUsers = [
     {
         id: 1,
         name: 'Administrador',
-        email: 'admin@reuniaofacil.com',
+        email: 'admin@salalivre.com',
         password: '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/UnTDhp/X5j0wWjY6u', // admin123
         role: 'admin',
         department: 'Administração',
@@ -22,7 +22,7 @@ const testUsers = [
     {
         id: 2,
         name: 'João Silva',
-        email: 'joao@reuniaofacil.com',
+        email: 'joao@salalivre.com',
         password: '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/UnTDhp/X5j0wWjY6u', // admin123
         role: 'user',
         department: 'Vendas',
@@ -36,7 +36,7 @@ const testUsers = [
     {
         id: 3,
         name: 'Maria Santos',
-        email: 'maria@reuniaofacil.com',
+        email: 'maria@salalivre.com',
         password: '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/UnTDhp/X5j0wWjY6u', // admin123
         role: 'manager',
         department: 'Recursos Humanos',
