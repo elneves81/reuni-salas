@@ -27,9 +27,14 @@ exports.handler = async (event, context) => {
     }
 
     try {
-        const { email, password } = JSON.parse(event.body);
+        const bodyData = JSON.parse(event.body);
+        const { email, password } = bodyData;
 
-        console.log('Login attempt:', { email, password: password ? '***' : 'empty' });
+        console.log('Full request body:', bodyData);
+        console.log('Email received:', JSON.stringify(email));
+        console.log('Password received:', JSON.stringify(password));
+        console.log('Email length:', email ? email.length : 'null');
+        console.log('Password length:', password ? password.length : 'null');
 
         // Para teste, aceitar apenas o admin
         if (email === 'admin@salalivre.com' && password === 'admin123') {
