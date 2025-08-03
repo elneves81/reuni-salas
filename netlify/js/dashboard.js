@@ -384,29 +384,7 @@ function initializeCalendar() {
         locale: 'pt-br',
         headerToolbar: false,
         height: 'auto',
-        events: [
-            {
-                title: 'Reunião Alpha - Equipe Marketing',
-                start: '2025-08-01T09:00:00',
-                end: '2025-08-01T10:30:00',
-                backgroundColor: 'var(--primary-color)',
-                borderColor: 'var(--primary-color)'
-            },
-            {
-                title: 'Sala Beta - Treinamento',
-                start: '2025-08-01T14:00:00',
-                end: '2025-08-01T16:00:00',
-                backgroundColor: 'var(--accent-color)',
-                borderColor: 'var(--accent-color)'
-            },
-            {
-                title: 'Sala Gamma - Apresentação',
-                start: '2025-08-02T10:00:00',
-                end: '2025-08-02T11:00:00',
-                backgroundColor: 'var(--secondary-color)',
-                borderColor: 'var(--secondary-color)'
-            }
-        ],
+        events: loadSavedEvents(), // Carregar eventos salvos
         eventClick: function(info) {
             openModal('Detalhes da Reserva', createEventDetails(info.event));
         },
@@ -424,6 +402,9 @@ function initializeCalendar() {
     
     // Inicializar navegação do calendário
     initCalendarNavigation();
+    
+    // Limpar eventos expirados periodicamente
+    cleanExpiredEvents();
 }
 
 function initCalendarNavigation() {
@@ -453,6 +434,113 @@ function updateCalendarTitle(date) {
     const titleElement = document.getElementById('currentMonth');
     if (titleElement) {
         titleElement.textContent = `${month} ${year}`;
+    }
+}
+
+// ==================== EVENT PERSISTENCE ====================
+function saveEvent(eventData) {
+    console.log('Salvando evento:', eventData);
+    
+    let savedEvents = JSON.parse(localStorage.getItem('salalivre_events') || '[]');
+    
+    // Adicionar timestamp de criação se não existir
+    if (!eventData.createdAt) {
+        eventData.createdAt = new Date().toISOString();
+    }
+    
+    savedEvents.push(eventData);
+    localStorage.setItem('salalivre_events', JSON.stringify(savedEvents));
+    
+    console.log('Evento salvo. Total de eventos:', savedEvents.length);
+}
+
+function loadSavedEvents() {
+    const savedEvents = JSON.parse(localStorage.getItem('salalivre_events') || '[]');
+    console.log('Carregando eventos salvos:', savedEvents.length);
+    
+    // Adicionar alguns eventos padrão se não houver eventos salvos
+    if (savedEvents.length === 0) {
+        const defaultEvents = [
+            {
+                id: 'demo-1',
+                title: 'Reunião Alpha - Equipe Marketing',
+                start: '2025-08-01T09:00:00',
+                end: '2025-08-01T10:30:00',
+                backgroundColor: 'var(--primary-color)',
+                borderColor: 'var(--primary-color)',
+                extendedProps: {
+                    room: 'Sala Alpha',
+                    roomId: '1',
+                    description: 'Reunião de planejamento mensal',
+                    organizer: 'Demo',
+                    originalTitle: 'Reunião Alpha - Equipe Marketing'
+                }
+            },
+            {
+                id: 'demo-2',
+                title: 'Sala Beta - Treinamento',
+                start: '2025-08-01T14:00:00',
+                end: '2025-08-01T16:00:00',
+                backgroundColor: 'var(--accent-color)',
+                borderColor: 'var(--accent-color)',
+                extendedProps: {
+                    room: 'Sala Beta',
+                    roomId: '2',
+                    description: 'Treinamento de novos colaboradores',
+                    organizer: 'Demo',
+                    originalTitle: 'Sala Beta - Treinamento'
+                }
+            }
+        ];
+        
+        // Salvar eventos padrão
+        localStorage.setItem('salalivre_events', JSON.stringify(defaultEvents));
+        return defaultEvents;
+    }
+    
+    return savedEvents;
+}
+
+function updateEvent(eventId, updatedData) {
+    let savedEvents = JSON.parse(localStorage.getItem('salalivre_events') || '[]');
+    
+    const eventIndex = savedEvents.findIndex(event => event.id === eventId);
+    if (eventIndex !== -1) {
+        savedEvents[eventIndex] = { ...savedEvents[eventIndex], ...updatedData };
+        localStorage.setItem('salalivre_events', JSON.stringify(savedEvents));
+        console.log('Evento atualizado:', eventId);
+    }
+}
+
+function deleteEvent(eventId) {
+    let savedEvents = JSON.parse(localStorage.getItem('salalivre_events') || '[]');
+    
+    savedEvents = savedEvents.filter(event => event.id !== eventId);
+    localStorage.setItem('salalivre_events', JSON.stringify(savedEvents));
+    console.log('Evento removido:', eventId);
+}
+
+function cleanExpiredEvents() {
+    console.log('Limpando eventos expirados...');
+    
+    let savedEvents = JSON.parse(localStorage.getItem('salalivre_events') || '[]');
+    const now = new Date();
+    
+    // Manter apenas eventos que ainda não terminaram
+    const activeEvents = savedEvents.filter(event => {
+        const eventEnd = new Date(event.end);
+        return eventEnd > now;
+    });
+    
+    if (activeEvents.length !== savedEvents.length) {
+        localStorage.setItem('salalivre_events', JSON.stringify(activeEvents));
+        console.log(`Removidos ${savedEvents.length - activeEvents.length} eventos expirados`);
+        
+        // Recarregar calendário se eventos foram removidos
+        if (calendar) {
+            calendar.removeAllEvents();
+            activeEvents.forEach(event => calendar.addEvent(event));
+        }
     }
 }
 
@@ -955,8 +1043,12 @@ function handleBookingSubmission(data) {
     if (calendar) {
         console.log('Adding event to calendar:', newEvent);
         calendar.addEvent(newEvent);
-        console.log('Event added successfully to calendar');
-        console.log('Calendar events after addition:', calendar.getEvents());
+        
+        // Salvar evento no localStorage
+        saveEvent(newEvent);
+        
+        console.log('Event added successfully to calendar and saved');
+        console.log('Calendar events after addition:', calendar.getEvents().length);
     } else {
         console.error('Calendar is not initialized!');
     }
@@ -1116,6 +1208,7 @@ window.addEventListener('resize', function() {
 setInterval(() => {
     loadKPIs();
     loadRecentActivity();
+    cleanExpiredEvents(); // Limpar eventos expirados periodicamente
 }, 60000); // Atualizar a cada minuto
 
 // ==================== EVENT MANAGEMENT ====================
@@ -1150,7 +1243,16 @@ function deleteEvent(eventId) {
         const event = calendar.getEventById(eventId);
         if (event) {
             const eventTitle = event.extendedProps.originalTitle || event.title;
+            
+            // Remover do calendário
             event.remove();
+            
+            // Remover do localStorage
+            let savedEvents = JSON.parse(localStorage.getItem('salalivre_events') || '[]');
+            savedEvents = savedEvents.filter(e => e.id !== eventId);
+            localStorage.setItem('salalivre_events', JSON.stringify(savedEvents));
+            
+            console.log('Evento removido do localStorage:', eventId);
             
             // Adicionar à atividade recente
             addRecentActivity({
@@ -1256,6 +1358,19 @@ function handleEditBookingSubmission(data, eventId) {
         event.setExtendedProp('roomId', data.room);
         event.setExtendedProp('description', data.description);
         event.setExtendedProp('originalTitle', data.title);
+        
+        // Atualizar evento no localStorage
+        updateEvent(eventId, {
+            title: `${data.title} - ${roomName}`,
+            start: startDateTime,
+            end: endDateTime,
+            extendedProps: {
+                room: roomName,
+                roomId: data.room,
+                description: data.description,
+                originalTitle: data.title
+            }
+        });
         
         // Adicionar à atividade recente
         addRecentActivity({
