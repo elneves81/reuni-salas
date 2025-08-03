@@ -389,7 +389,8 @@ function initializeCalendar() {
             openModal('Detalhes da Reserva', createEventDetails(info.event));
         },
         dateClick: function(info) {
-            openModal('Nova Reserva', createBookingForm(info.dateStr));
+            // Quando clicar numa data específica do calendário, travar a data
+            openModal('Nova Reserva', createBookingForm(info.dateStr, true));
         },
         datesSet: function(info) {
             // Atualizar o título do mês sempre que as datas mudarem
@@ -690,7 +691,19 @@ function handleQuickAction(e) {
 }
 
 // ==================== MODAL FORMS ====================
-function createBookingForm(date = '') {
+function createBookingForm(date = '', lockDate = false) {
+    const dateInput = lockDate 
+        ? `<input type="date" id="bookingDate" name="date" value="${date}" readonly required style="background-color: #f8f9fa; cursor: not-allowed; border: 2px solid #22c55e;">`
+        : `<input type="date" id="bookingDate" name="date" value="${date}" required>`;
+    
+    const dateLabel = lockDate 
+        ? `<label for="bookingDate">Data <span style="color: #22c55e; font-size: 0.85em; font-weight: bold;">(selecionada no calendário - ${formatDateForDisplay(date)})</span></label>`
+        : `<label for="bookingDate">Data</label>`;
+    
+    const dateHelp = lockDate 
+        ? `<small style="color: #666; margin-top: 4px; display: block;">📅 Data fixada pelo calendário. Para alterar, use "Nova Reserva" no menu.</small>`
+        : '';
+        
     return `
         <form id="bookingForm" class="modal-form">
             <div class="form-group">
@@ -700,8 +713,9 @@ function createBookingForm(date = '') {
             
             <div class="form-row">
                 <div class="form-group">
-                    <label for="bookingDate">Data</label>
-                    <input type="date" id="bookingDate" name="date" value="${date}" required>
+                    ${dateLabel}
+                    ${dateInput}
+                    ${dateHelp}
                 </div>
                 <div class="form-group">
                     <label for="bookingRoom">Sala</label>
@@ -1106,6 +1120,17 @@ function getRandomEventColor() {
 function formatDate(dateString) {
     const date = new Date(dateString);
     return date.toLocaleDateString('pt-BR');
+}
+
+function formatDateForDisplay(dateString) {
+    const date = new Date(dateString + 'T00:00:00');
+    const options = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    };
+    return date.toLocaleDateString('pt-BR', options);
 }
 
 function addRecentActivity(activity) {
