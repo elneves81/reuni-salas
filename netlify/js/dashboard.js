@@ -175,6 +175,12 @@ function initializeDashboard() {
     initializeCalendar();
     loadDashboardData();
     
+    // Inicializar novas seções
+    initializeBookingsSection();
+    initializeUsersSection();
+    initializeReportsSection();
+    initializeSettingsSection();
+    
     // Configurar sidebar
     setupSidebar();
     
@@ -317,10 +323,10 @@ function updatePageTitle(section) {
         dashboard: 'Dashboard Executivo',
         calendar: 'Calendário',
         rooms: 'Gerenciamento de Salas',
-        bookings: 'Reservas',
-        users: 'Usuários',
-        reports: 'Relatórios',
-        settings: 'Configurações'
+        reservas: 'Gerenciamento de Reservas',
+        users: 'Gerenciamento de Usuários',
+        reports: 'Relatórios e Análises',
+        settings: 'Configurações do Sistema'
     };
     
     document.getElementById('pageTitle').textContent = titles[section] || 'Dashboard';
@@ -334,14 +340,17 @@ function loadSectionData(section) {
         case 'rooms':
             loadRooms();
             break;
-        case 'bookings':
-            loadBookings();
+        case 'reservas':
+            renderBookingsTable();
             break;
         case 'users':
-            loadUsers();
+            renderUsersGrid();
             break;
         case 'reports':
-            loadReports();
+            loadReportsData();
+            break;
+        case 'settings':
+            loadSettingsData();
             break;
     }
 }
@@ -1619,5 +1628,476 @@ function handleEditBookingSubmission(data, eventId) {
     } else {
         hideLoading();
         showNotification('Erro: Evento não encontrado.', 'error');
+    }
+}
+
+// ==================== RESERVAS MANAGEMENT ====================
+let bookingsData = [];
+
+function initializeBookingsSection() {
+    loadBookingsData();
+    setupBookingsEventListeners();
+}
+
+function loadBookingsData() {
+    // Simular dados de reservas
+    bookingsData = [
+        {
+            id: 'BK001',
+            title: 'Reunião Alpha - Marketing',
+            room: 'Sala Alpha',
+            date: '2025-08-03',
+            startTime: '09:00',
+            endTime: '10:30',
+            organizer: 'João Silva',
+            status: 'confirmed'
+        },
+        {
+            id: 'BK002',
+            title: 'Treinamento Beta',
+            room: 'Sala Beta',
+            date: '2025-08-03',
+            startTime: '14:00',
+            endTime: '16:00',
+            organizer: 'Maria Santos',
+            status: 'pending'
+        },
+        {
+            id: 'BK003',
+            title: 'Reunião Cancelada',
+            room: 'Sala Gamma',
+            date: '2025-08-02',
+            startTime: '10:00',
+            endTime: '11:00',
+            organizer: 'Pedro Lima',
+            status: 'cancelled'
+        }
+    ];
+    
+    renderBookingsTable();
+}
+
+function renderBookingsTable() {
+    const tbody = document.querySelector('#bookingsTable tbody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = bookingsData.map(booking => `
+        <tr>
+            <td>${booking.id}</td>
+            <td>${booking.title}</td>
+            <td>${booking.room}</td>
+            <td>${formatDateForDisplay(booking.date)}</td>
+            <td>${booking.startTime} - ${booking.endTime}</td>
+            <td>${booking.organizer}</td>
+            <td><span class="booking-status ${booking.status}">${getStatusText(booking.status)}</span></td>
+            <td>
+                <button class="room-action-btn" onclick="editBooking('${booking.id}')">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="room-action-btn" onclick="deleteBooking('${booking.id}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function getStatusText(status) {
+    const statusMap = {
+        'confirmed': 'Confirmada',
+        'pending': 'Pendente',
+        'cancelled': 'Cancelada'
+    };
+    return statusMap[status] || status;
+}
+
+function setupBookingsEventListeners() {
+    const newBookingBtn = document.getElementById('newBookingBtn');
+    const bookingSearch = document.getElementById('bookingSearch');
+    const bookingStatusFilter = document.getElementById('bookingStatusFilter');
+    const bookingDateFilter = document.getElementById('bookingDateFilter');
+    
+    if (newBookingBtn) {
+        newBookingBtn.addEventListener('click', () => {
+            openBookingModal();
+        });
+    }
+    
+    if (bookingSearch) {
+        bookingSearch.addEventListener('input', filterBookings);
+    }
+    
+    if (bookingStatusFilter) {
+        bookingStatusFilter.addEventListener('change', filterBookings);
+    }
+    
+    if (bookingDateFilter) {
+        bookingDateFilter.addEventListener('change', filterBookings);
+    }
+}
+
+function filterBookings() {
+    // Implementar filtros de reservas
+    console.log('Filtrando reservas...');
+}
+
+// ==================== USERS MANAGEMENT ====================
+let usersData = [];
+
+function initializeUsersSection() {
+    loadUsersData();
+    setupUsersEventListeners();
+}
+
+function loadUsersData() {
+    // Simular dados de usuários
+    usersData = [
+        {
+            id: 'U001',
+            name: 'João Silva',
+            email: 'joao.silva@empresa.com',
+            role: 'admin',
+            department: 'ti',
+            lastAccess: '2025-08-03T10:30:00',
+            status: 'active'
+        },
+        {
+            id: 'U002',
+            name: 'Maria Santos',
+            email: 'maria.santos@empresa.com',
+            role: 'manager',
+            department: 'rh',
+            lastAccess: '2025-08-02T16:45:00',
+            status: 'active'
+        },
+        {
+            id: 'U003',
+            name: 'Pedro Lima',
+            email: 'pedro.lima@empresa.com',
+            role: 'user',
+            department: 'vendas',
+            lastAccess: '2025-08-01T14:20:00',
+            status: 'inactive'
+        }
+    ];
+    
+    renderUsersGrid();
+}
+
+function renderUsersGrid() {
+    const usersGrid = document.getElementById('usersGrid');
+    if (!usersGrid) return;
+    
+    usersGrid.innerHTML = usersData.map(user => `
+        <div class="user-card">
+            <div class="user-card-header">
+                <div class="user-card-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-card-info">
+                    <h3>${user.name}</h3>
+                    <span class="user-card-role">${getRoleText(user.role)}</span>
+                </div>
+            </div>
+            <div class="user-card-details">
+                <div class="user-card-detail">
+                    <i class="fas fa-envelope"></i>
+                    <span>${user.email}</span>
+                </div>
+                <div class="user-card-detail">
+                    <i class="fas fa-building"></i>
+                    <span>${getDepartmentText(user.department)}</span>
+                </div>
+                <div class="user-card-detail">
+                    <i class="fas fa-clock"></i>
+                    <span>Último acesso: ${formatDateForDisplay(user.lastAccess.split('T')[0])}</span>
+                </div>
+            </div>
+            <div class="user-card-actions">
+                <button class="room-action-btn" onclick="editUser('${user.id}')">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="room-action-btn" onclick="deleteUser('${user.id}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+                <button class="room-action-btn primary" onclick="viewUserDetails('${user.id}')">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function getRoleText(role) {
+    const roleMap = {
+        'admin': 'Administrador',
+        'manager': 'Gerente',
+        'user': 'Usuário'
+    };
+    return roleMap[role] || role;
+}
+
+function getDepartmentText(department) {
+    const deptMap = {
+        'ti': 'Tecnologia',
+        'rh': 'Recursos Humanos',
+        'vendas': 'Vendas',
+        'marketing': 'Marketing'
+    };
+    return deptMap[department] || department;
+}
+
+function setupUsersEventListeners() {
+    const addUserBtn = document.getElementById('addUserBtn');
+    const userSearch = document.getElementById('userSearch');
+    const roleFilter = document.getElementById('roleFilter');
+    const departmentFilter = document.getElementById('departmentFilter');
+    
+    if (addUserBtn) {
+        addUserBtn.addEventListener('click', () => {
+            openUserModal();
+        });
+    }
+    
+    if (userSearch) {
+        userSearch.addEventListener('input', filterUsers);
+    }
+    
+    if (roleFilter) {
+        roleFilter.addEventListener('change', filterUsers);
+    }
+    
+    if (departmentFilter) {
+        departmentFilter.addEventListener('change', filterUsers);
+    }
+}
+
+function filterUsers() {
+    // Implementar filtros de usuários
+    console.log('Filtrando usuários...');
+}
+
+// ==================== REPORTS MANAGEMENT ====================
+function initializeReportsSection() {
+    setupReportsEventListeners();
+    loadReportsData();
+}
+
+function setupReportsEventListeners() {
+    const exportBtn = document.getElementById('exportReportBtn');
+    const tabBtns = document.querySelectorAll('.reports-tabs .tab-btn');
+    
+    if (exportBtn) {
+        exportBtn.addEventListener('click', exportReport);
+    }
+    
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const tab = e.target.dataset.tab;
+            switchReportsTab(tab);
+        });
+    });
+}
+
+function switchReportsTab(activeTab) {
+    // Remover classe ativa de todos os botões e conteúdos
+    document.querySelectorAll('.reports-tabs .tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelectorAll('.reports-content .tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // Adicionar classe ativa ao botão e conteúdo selecionados
+    document.querySelector(`[data-tab="${activeTab}"]`).classList.add('active');
+    document.getElementById(`${activeTab}-tab`).classList.add('active');
+}
+
+function loadReportsData() {
+    // Simular dados para relatórios
+    document.getElementById('totalUsers').textContent = usersData.length;
+    document.getElementById('activeUsers').textContent = usersData.filter(u => u.status === 'active').length;
+    document.getElementById('avgBookingsPerUser').textContent = '2.5';
+}
+
+function exportReport() {
+    showNotification('Relatório exportado com sucesso!', 'success');
+}
+
+// ==================== SETTINGS MANAGEMENT ====================
+function initializeSettingsSection() {
+    setupSettingsEventListeners();
+    loadSettingsData();
+}
+
+function setupSettingsEventListeners() {
+    const saveBtn = document.getElementById('saveSettingsBtn');
+    const tabBtns = document.querySelectorAll('.settings-tabs .tab-btn');
+    
+    if (saveBtn) {
+        saveBtn.addEventListener('click', saveSettings);
+    }
+    
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const tab = e.target.dataset.tab;
+            switchSettingsTab(tab);
+        });
+    });
+}
+
+function switchSettingsTab(activeTab) {
+    // Remover classe ativa de todos os botões e conteúdos
+    document.querySelectorAll('.settings-tabs .tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelectorAll('.settings-content .tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // Adicionar classe ativa ao botão e conteúdo selecionados
+    document.querySelector(`[data-tab="${activeTab}"]`).classList.add('active');
+    document.getElementById(`${activeTab}-tab`).classList.add('active');
+}
+
+function loadSettingsData() {
+    // Carregar configurações salvas
+    const settings = JSON.parse(localStorage.getItem('salalivre_settings') || '{}');
+    
+    // Aplicar configurações aos campos
+    if (settings.companyName) {
+        document.getElementById('companyName').value = settings.companyName;
+    }
+    if (settings.timezone) {
+        document.getElementById('timezone').value = settings.timezone;
+    }
+    if (settings.startTime) {
+        document.getElementById('startTime').value = settings.startTime;
+    }
+    if (settings.endTime) {
+        document.getElementById('endTime').value = settings.endTime;
+    }
+}
+
+function saveSettings() {
+    const settings = {
+        companyName: document.getElementById('companyName').value,
+        timezone: document.getElementById('timezone').value,
+        startTime: document.getElementById('startTime').value,
+        endTime: document.getElementById('endTime').value,
+        emailNotifications: document.getElementById('emailNotifications').checked,
+        smsNotifications: document.getElementById('smsNotifications').checked,
+        pushNotifications: document.getElementById('pushNotifications').checked,
+        passwordPolicy: document.getElementById('passwordPolicy').value,
+        sessionTimeout: document.getElementById('sessionTimeout').value
+    };
+    
+    localStorage.setItem('salalivre_settings', JSON.stringify(settings));
+    showNotification('Configurações salvas com sucesso!', 'success');
+}
+
+// ==================== MODAL FUNCTIONS ====================
+function openBookingModal() {
+    const modal = document.getElementById('actionModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    
+    modalTitle.textContent = 'Nova Reserva';
+    modalBody.innerHTML = createBookingForm();
+    
+    modal.classList.add('show');
+}
+
+function openUserModal() {
+    const modal = document.getElementById('actionModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    
+    modalTitle.textContent = 'Novo Usuário';
+    modalBody.innerHTML = createUserForm();
+    
+    modal.classList.add('show');
+}
+
+function createUserForm() {
+    return `
+        <form id="userForm" class="modal-form">
+            <div class="form-group">
+                <label for="userName">Nome Completo</label>
+                <input type="text" id="userName" name="name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="userEmail">E-mail</label>
+                <input type="email" id="userEmail" name="email" required>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="userRole">Perfil</label>
+                    <select id="userRole" name="role" required>
+                        <option value="">Selecionar perfil</option>
+                        <option value="admin">Administrador</option>
+                        <option value="manager">Gerente</option>
+                        <option value="user">Usuário</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="userDepartment">Departamento</label>
+                    <select id="userDepartment" name="department" required>
+                        <option value="">Selecionar departamento</option>
+                        <option value="ti">Tecnologia</option>
+                        <option value="rh">Recursos Humanos</option>
+                        <option value="vendas">Vendas</option>
+                        <option value="marketing">Marketing</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="userPassword">Senha</label>
+                <input type="password" id="userPassword" name="password" required>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" onclick="closeModal()">Cancelar</button>
+                <button type="submit" class="btn-primary">Criar Usuário</button>
+            </div>
+        </form>
+    `;
+}
+
+// ==================== CRUD FUNCTIONS ====================
+function editBooking(bookingId) {
+    console.log('Editando reserva:', bookingId);
+    showNotification('Funcionalidade de edição em desenvolvimento', 'info');
+}
+
+function deleteBooking(bookingId) {
+    if (confirm('Tem certeza que deseja excluir esta reserva?')) {
+        bookingsData = bookingsData.filter(b => b.id !== bookingId);
+        renderBookingsTable();
+        showNotification('Reserva excluída com sucesso!', 'success');
+    }
+}
+
+function editUser(userId) {
+    console.log('Editando usuário:', userId);
+    showNotification('Funcionalidade de edição em desenvolvimento', 'info');
+}
+
+function deleteUser(userId) {
+    if (confirm('Tem certeza que deseja excluir este usuário?')) {
+        usersData = usersData.filter(u => u.id !== userId);
+        renderUsersGrid();
+        showNotification('Usuário excluído com sucesso!', 'success');
+    }
+}
+
+function viewUserDetails(userId) {
+    const user = usersData.find(u => u.id === userId);
+    if (user) {
+        showNotification(`Visualizando detalhes de: ${user.name}`, 'info');
     }
 }

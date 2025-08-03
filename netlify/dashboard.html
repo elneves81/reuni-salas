@@ -310,6 +310,290 @@
                 </div>
             </section>
 
+            <!-- Reservas Section -->
+            <section id="reservas-section" class="content-section">
+                <div class="section-header">
+                    <h2>Gerenciamento de Reservas</h2>
+                    <button class="btn-primary" id="newBookingBtn">
+                        <i class="fas fa-plus"></i>
+                        Nova Reserva
+                    </button>
+                </div>
+                
+                <div class="filters-bar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Buscar reservas..." id="bookingSearch">
+                    </div>
+                    <div class="filter-controls">
+                        <select id="bookingStatusFilter">
+                            <option value="">Todos os Status</option>
+                            <option value="confirmed">Confirmada</option>
+                            <option value="pending">Pendente</option>
+                            <option value="cancelled">Cancelada</option>
+                        </select>
+                        <select id="bookingDateFilter">
+                            <option value="">Todas as Datas</option>
+                            <option value="today">Hoje</option>
+                            <option value="week">Esta Semana</option>
+                            <option value="month">Este Mês</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="bookings-table-container">
+                    <table class="bookings-table" id="bookingsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Título</th>
+                                <th>Sala</th>
+                                <th>Data</th>
+                                <th>Horário</th>
+                                <th>Organizador</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Bookings will be populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Users Section -->
+            <section id="users-section" class="content-section">
+                <div class="section-header">
+                    <h2>Gerenciamento de Usuários</h2>
+                    <button class="btn-primary" id="addUserBtn">
+                        <i class="fas fa-plus"></i>
+                        Adicionar Usuário
+                    </button>
+                </div>
+                
+                <div class="filters-bar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Buscar usuários..." id="userSearch">
+                    </div>
+                    <div class="filter-controls">
+                        <select id="roleFilter">
+                            <option value="">Todos os Perfis</option>
+                            <option value="admin">Administrador</option>
+                            <option value="manager">Gerente</option>
+                            <option value="user">Usuário</option>
+                        </select>
+                        <select id="departmentFilter">
+                            <option value="">Todos os Departamentos</option>
+                            <option value="ti">TI</option>
+                            <option value="rh">RH</option>
+                            <option value="vendas">Vendas</option>
+                            <option value="marketing">Marketing</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="users-grid" id="usersGrid">
+                    <!-- Users will be populated by JS -->
+                </div>
+            </section>
+
+            <!-- Reports Section -->
+            <section id="reports-section" class="content-section">
+                <div class="section-header">
+                    <h2>Relatórios e Análises</h2>
+                    <button class="btn-primary" id="exportReportBtn">
+                        <i class="fas fa-download"></i>
+                        Exportar Relatório
+                    </button>
+                </div>
+
+                <div class="reports-tabs">
+                    <button class="tab-btn active" data-tab="usage">Uso das Salas</button>
+                    <button class="tab-btn" data-tab="occupancy">Taxa de Ocupação</button>
+                    <button class="tab-btn" data-tab="users">Usuários Ativos</button>
+                    <button class="tab-btn" data-tab="revenue">Receita</button>
+                </div>
+
+                <div class="reports-content">
+                    <div class="tab-content active" id="usage-tab">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Uso das Salas por Período</h3>
+                                <select id="usagePeriod">
+                                    <option value="week">Última Semana</option>
+                                    <option value="month">Último Mês</option>
+                                    <option value="quarter">Último Trimestre</option>
+                                </select>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="usageChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="occupancy-tab">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Taxa de Ocupação por Horário</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="occupancyReportChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="users-tab">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Usuários Mais Ativos</h3>
+                            </div>
+                            <div class="users-stats">
+                                <div class="stat-item">
+                                    <span class="stat-label">Total de Usuários</span>
+                                    <span class="stat-value" id="totalUsers">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Usuários Ativos</span>
+                                    <span class="stat-value" id="activeUsers">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Reservas por Usuário</span>
+                                    <span class="stat-value" id="avgBookingsPerUser">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="revenue-tab">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Análise de Receita</h3>
+                            </div>
+                            <div class="revenue-stats">
+                                <div class="stat-card">
+                                    <h4>Receita Mensal</h4>
+                                    <span class="revenue-value">R$ 0,00</span>
+                                </div>
+                                <div class="stat-card">
+                                    <h4>Receita Anual</h4>
+                                    <span class="revenue-value">R$ 0,00</span>
+                                </div>
+                                <div class="stat-card">
+                                    <h4>Crescimento</h4>
+                                    <span class="revenue-value">+0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings-section" class="content-section">
+                <div class="section-header">
+                    <h2>Configurações do Sistema</h2>
+                    <button class="btn-primary" id="saveSettingsBtn">
+                        <i class="fas fa-save"></i>
+                        Salvar Alterações
+                    </button>
+                </div>
+
+                <div class="settings-tabs">
+                    <button class="tab-btn active" data-tab="general">Geral</button>
+                    <button class="tab-btn" data-tab="notifications">Notificações</button>
+                    <button class="tab-btn" data-tab="integrations">Integrações</button>
+                    <button class="tab-btn" data-tab="security">Segurança</button>
+                </div>
+
+                <div class="settings-content">
+                    <div class="tab-content active" id="general-tab">
+                        <div class="settings-card">
+                            <h3>Configurações Gerais</h3>
+                            <div class="form-group">
+                                <label for="companyName">Nome da Empresa</label>
+                                <input type="text" id="companyName" value="Sala Livre" />
+                            </div>
+                            <div class="form-group">
+                                <label for="timezone">Fuso Horário</label>
+                                <select id="timezone">
+                                    <option value="America/Sao_Paulo">Brasília (UTC-3)</option>
+                                    <option value="America/New_York">Nova York (UTC-5)</option>
+                                    <option value="Europe/London">Londres (UTC+0)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="workingHours">Horário de Funcionamento</label>
+                                <div class="time-range">
+                                    <input type="time" id="startTime" value="08:00">
+                                    <span>até</span>
+                                    <input type="time" id="endTime" value="18:00">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="notifications-tab">
+                        <div class="settings-card">
+                            <h3>Configurações de Notificações</h3>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="emailNotifications" checked>
+                                    <span>Notificações por E-mail</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="smsNotifications">
+                                    <span>Notificações por SMS</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="pushNotifications" checked>
+                                    <span>Notificações Push</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="integrations-tab">
+                        <div class="settings-card">
+                            <h3>Integrações</h3>
+                            <div class="integration-item">
+                                <div class="integration-info">
+                                    <h4>Google Calendar</h4>
+                                    <p>Sincronizar reservas com Google Calendar</p>
+                                </div>
+                                <button class="btn-secondary">Conectar</button>
+                            </div>
+                            <div class="integration-item">
+                                <div class="integration-info">
+                                    <h4>Microsoft Teams</h4>
+                                    <p>Integração com Microsoft Teams</p>
+                                </div>
+                                <button class="btn-secondary">Conectar</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="security-tab">
+                        <div class="settings-card">
+                            <h3>Configurações de Segurança</h3>
+                            <div class="form-group">
+                                <label for="passwordPolicy">Política de Senhas</label>
+                                <select id="passwordPolicy">
+                                    <option value="basic">Básica (8 caracteres)</option>
+                                    <option value="medium">Média (8 chars + números)</option>
+                                    <option value="strong">Forte (8 chars + números + símbolos)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="sessionTimeout">Timeout de Sessão (minutos)</label>
+                                <input type="number" id="sessionTimeout" value="30" min="5" max="480">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Other sections will be added here -->
         </div>
     </main>
