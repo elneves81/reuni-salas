@@ -8,13 +8,25 @@
 }
 
 :root {
-    /* Colors */
-    --primary-color: #22c55e;
-    --primary-dark: #16a34a;
-    --primary-light: #86efac;
-    --secondary-color: #ef4444;
-    --secondary-dark: #dc2626;
+    /* Colors - Blue & White Theme */
+    --primary-color: #2563eb;
+    --primary-dark: #1d4ed8;
+    --primary-light: #93c5fd;
+    --secondary-color: #1e40af;
+    --secondary-dark: #1e3a8a;
     --accent-color: #3b82f6;
+    
+    /* Blue variations */
+    --blue-50: #eff6ff;
+    --blue-100: #dbeafe;
+    --blue-200: #bfdbfe;
+    --blue-300: #93c5fd;
+    --blue-400: #60a5fa;
+    --blue-500: #3b82f6;
+    --blue-600: #2563eb;
+    --blue-700: #1d4ed8;
+    --blue-800: #1e40af;
+    --blue-900: #1e3a8a;
     
     /* Neutrals */
     --white: #ffffff;
@@ -240,7 +252,7 @@ body {
 }
 
 .logout-btn:hover {
-    background-color: var(--secondary-color);
+    background-color: var(--blue-600);
     color: var(--white);
 }
 
@@ -489,11 +501,11 @@ body {
 }
 
 .kpi-change.positive {
-    color: var(--primary-color);
+    color: var(--blue-600);
 }
 
 .kpi-change.negative {
-    color: var(--secondary-color);
+    color: var(--blue-400);
 }
 
 .kpi-change i {
@@ -622,14 +634,14 @@ body {
     padding: 1rem;
     background-color: var(--gray-50);
     border-radius: var(--border-radius-sm);
-    border-left: 4px solid var(--primary-color);
+    border-left: 4px solid var(--blue-500);
 }
 
 .activity-icon {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background-color: var(--primary-color);
+    background-color: var(--blue-500);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -676,8 +688,8 @@ body {
 }
 
 .quick-action-btn:hover {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
+    background-color: var(--blue-500);
+    border-color: var(--blue-500);
     color: var(--white);
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
@@ -853,18 +865,18 @@ body {
 }
 
 .room-status.available {
-    background-color: var(--primary-light);
-    color: var(--primary-dark);
+    background-color: var(--blue-100);
+    color: var(--blue-700);
 }
 
 .room-status.occupied {
-    background-color: #fecaca;
-    color: var(--secondary-dark);
+    background-color: var(--blue-700);
+    color: var(--white);
 }
 
 .room-status.maintenance {
-    background-color: #fed7aa;
-    color: #ea580c;
+    background-color: var(--blue-500);
+    color: var(--white);
 }
 
 .room-details {

@@ -446,8 +446,8 @@ function initializeOccupationChart() {
             datasets: [{
                 label: 'Taxa de Ocupação (%)',
                 data: [15, 45, 78, 85, 92, 65, 88, 95, 82, 70, 35],
-                borderColor: 'var(--primary-color)',
-                backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                borderColor: '#2563eb',
+                backgroundColor: 'rgba(37, 99, 235, 0.1)',
                 tension: 0.4,
                 fill: true
             }]
@@ -485,10 +485,10 @@ function initializeRoomsChart() {
             datasets: [{
                 data: [35, 28, 22, 15],
                 backgroundColor: [
-                    'var(--primary-color)',
-                    'var(--accent-color)',
-                    'var(--secondary-color)',
-                    '#f59e0b'
+                    '#2563eb',
+                    '#3b82f6',
+                    '#60a5fa',
+                    '#93c5fd'
                 ]
             }]
         },
@@ -623,8 +623,8 @@ function loadSavedEvents() {
                 title: 'Reunião Alpha - Equipe Marketing',
                 start: '2025-08-01T09:00:00',
                 end: '2025-08-01T10:30:00',
-                backgroundColor: 'var(--primary-color)',
-                borderColor: 'var(--primary-color)',
+                backgroundColor: '#2563eb',
+                borderColor: '#2563eb',
                 extendedProps: {
                     room: 'Sala Alpha',
                     roomId: '1',
@@ -638,8 +638,8 @@ function loadSavedEvents() {
                 title: 'Sala Beta - Treinamento',
                 start: '2025-08-01T14:00:00',
                 end: '2025-08-01T16:00:00',
-                backgroundColor: 'var(--accent-color)',
-                borderColor: 'var(--accent-color)',
+                backgroundColor: '#3b82f6',
+                borderColor: '#3b82f6',
                 extendedProps: {
                     room: 'Sala Beta',
                     roomId: '2',
@@ -849,11 +849,11 @@ function handleQuickAction(e) {
 // ==================== MODAL FORMS ====================
 function createBookingForm(date = '', lockDate = false) {
     const dateInput = lockDate 
-        ? `<input type="date" id="bookingDate" name="date" value="${date}" readonly required style="background-color: #f8f9fa; cursor: not-allowed; border: 2px solid #22c55e;">`
+        ? `<input type="date" id="bookingDate" name="date" value="${date}" readonly required style="background-color: #f8f9fa; cursor: not-allowed; border: 2px solid #2563eb;">`
         : `<input type="date" id="bookingDate" name="date" value="${date}" required>`;
     
     const dateLabel = lockDate 
-        ? `<label for="bookingDate">Data <span style="color: #22c55e; font-size: 0.85em; font-weight: bold;">(selecionada no calendário - ${formatDateForDisplay(date)})</span></label>`
+        ? `<label for="bookingDate">Data <span style="color: #2563eb; font-size: 0.85em; font-weight: bold;">(selecionada no calendário - ${formatDateForDisplay(date)})</span></label>`
         : `<label for="bookingDate">Data</label>`;
     
     const dateHelp = lockDate 
@@ -1263,12 +1263,12 @@ function handleBookingSubmission(data) {
 
 function getRandomEventColor() {
     const colors = [
-        'var(--primary-color)',
-        'var(--accent-color)', 
-        'var(--secondary-color)',
-        '#f59e0b',
-        '#8b5cf6',
-        '#06b6d4'
+        '#2563eb',
+        '#3b82f6', 
+        '#60a5fa',
+        '#93c5fd',
+        '#1d4ed8',
+        '#1e40af'
     ];
     return colors[Math.floor(Math.random() * colors.length)];
 }

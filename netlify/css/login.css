@@ -1,12 +1,12 @@
 /* ==================== VARIÁVEIS CSS ==================== */
 :root {
     /* Cores Principais */
-    --primary-green: #22c55e;
-    --primary-green-dark: #16a34a;
-    --primary-green-light: #dcfce7;
-    --primary-red: #ef4444;
-    --primary-red-dark: #dc2626;
-    --primary-red-light: #fef2f2;
+    --primary-blue: #2563eb;
+    --primary-blue-dark: #1d4ed8;
+    --primary-blue-light: #dbeafe;
+    --secondary-blue: #3b82f6;
+    --secondary-blue-dark: #2563eb;
+    --secondary-blue-light: #eff6ff;
     
     /* Cores Secundárias */
     --gray-50: #f9fafb;
@@ -71,7 +71,7 @@ body {
     font-size: var(--font-size-base);
     line-height: 1.6;
     color: var(--gray-800);
-    background: linear-gradient(135deg, var(--primary-green-light) 0%, var(--gray-50) 100%);
+    background: linear-gradient(135deg, var(--primary-blue-light) 0%, var(--gray-50) 100%);
     min-height: 100vh;
     overflow-x: hidden;
 }
@@ -100,7 +100,7 @@ body {
 .shape {
     position: absolute;
     border-radius: 50%;
-    background: linear-gradient(45deg, var(--primary-green), var(--primary-red));
+    background: linear-gradient(45deg, var(--primary-blue), var(--secondary-blue));
     opacity: 0.1;
     animation: float 6s ease-in-out infinite;
 }
@@ -168,7 +168,7 @@ body {
 .login-header {
     text-align: center;
     padding: var(--spacing-8) var(--spacing-6) var(--spacing-6);
-    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
     color: white;
     position: relative;
     overflow: hidden;
@@ -251,8 +251,8 @@ body {
 
 .tab-button.active {
     background: white;
-    color: var(--primary-green);
-    border-bottom: 2px solid var(--primary-green);
+    color: var(--primary-blue);
+    border-bottom: 2px solid var(--primary-blue);
 }
 
 .tab-button i {
@@ -291,7 +291,7 @@ body {
 
 .form-group label i {
     font-size: var(--font-size-sm);
-    color: var(--primary-green);
+    color: var(--primary-blue);
 }
 
 .form-group input {
@@ -306,7 +306,7 @@ body {
 
 .form-group input:focus {
     outline: none;
-    border-color: var(--primary-green);
+    border-color: var(--primary-blue);
     box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
 }
 
@@ -368,7 +368,7 @@ body {
 /* Classes para força da senha */
 .strength-weak .strength-fill {
     width: 33%;
-    background: var(--primary-red);
+    background: var(--secondary-blue);
 }
 
 .strength-medium .strength-fill {
@@ -378,7 +378,7 @@ body {
 
 .strength-strong .strength-fill {
     width: 100%;
-    background: var(--primary-green);
+    background: var(--primary-blue);
 }
 
 /* ==================== OPÇÕES DO FORMULÁRIO ==================== */
@@ -424,12 +424,12 @@ body {
 }
 
 .checkbox-container:hover .checkmark {
-    border-color: var(--primary-green);
+    border-color: var(--primary-blue);
 }
 
 .checkbox-container input:checked ~ .checkmark {
-    background: var(--primary-green);
-    border-color: var(--primary-green);
+    background: var(--primary-blue);
+    border-color: var(--primary-blue);
 }
 
 .checkmark:after {
@@ -452,7 +452,7 @@ body {
 /* ==================== LINKS ==================== */
 .forgot-password,
 .terms-link {
-    color: var(--primary-green);
+    color: var(--primary-blue);
     text-decoration: none;
     font-size: var(--font-size-sm);
     font-weight: 500;
@@ -461,7 +461,7 @@ body {
 
 .forgot-password:hover,
 .terms-link:hover {
-    color: var(--primary-green-dark);
+    color: var(--primary-blue-dark);
     text-decoration: underline;
 }
 
@@ -469,7 +469,7 @@ body {
 .btn-primary {
     width: 100%;
     padding: var(--spacing-3) var(--spacing-6);
-    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
     color: white;
     border: none;
     border-radius: var(--radius-md);
@@ -593,7 +593,7 @@ body {
 }
 
 .footer-links a:hover {
-    color: var(--primary-green);
+    color: var(--primary-blue);
 }
 
 /* ==================== LOADING OVERLAY ==================== */
@@ -620,7 +620,7 @@ body {
     width: 40px;
     height: 40px;
     border: 3px solid rgba(255, 255, 255, 0.3);
-    border-top: 3px solid var(--primary-green);
+    border-top: 3px solid var(--primary-blue);
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin: 0 auto var(--spacing-4);
@@ -765,12 +765,12 @@ body {
 
 /* ==================== ESTADOS DE ERRO ==================== */
 .form-group.error input {
-    border-color: var(--primary-red);
+    border-color: var(--secondary-blue);
     box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
 }
 
 .error-message {
-    color: var(--primary-red);
+    color: var(--secondary-blue);
     font-size: var(--font-size-xs);
     margin-top: var(--spacing-1);
     display: flex;
@@ -784,12 +784,12 @@ body {
 
 /* ==================== ESTADOS DE SUCESSO ==================== */
 .form-group.success input {
-    border-color: var(--primary-green);
+    border-color: var(--primary-blue);
     box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
 }
 
 .success-message {
-    color: var(--primary-green);
+    color: var(--primary-blue);
     font-size: var(--font-size-xs);
     margin-top: var(--spacing-1);
     display: flex;
