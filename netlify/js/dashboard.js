@@ -151,6 +151,11 @@ function showSection(sectionName) {
     }
 }
 
+function getCurrentSection() {
+    const activeSection = document.querySelector('.content-section.active');
+    return activeSection ? activeSection.id.replace('-section', '') : 'dashboard';
+}
+
 function updatePageTitle(section) {
     const titles = {
         dashboard: 'Dashboard Executivo',
@@ -413,6 +418,9 @@ function initializeCalendar() {
             updateCalendarTitle(info.start);
         }
     });
+    
+    // Renderizar o calendário
+    calendar.render();
     
     // Inicializar navegação do calendário
     initCalendarNavigation();
@@ -828,16 +836,19 @@ function handleFormSubmit(e) {
     const data = Object.fromEntries(formData);
     
     console.log('Form submitted:', data);
+    console.log('Form ID:', e.target.id);
     
     showLoading();
     
     // Verificar tipo de formulário
     if (e.target.id === 'bookingForm' || e.target.id === 'quickBookingForm') {
+        console.log('Calling handleBookingSubmission...');
         handleBookingSubmission(data);
     } else if (e.target.id === 'editBookingForm') {
         const eventId = e.target.getAttribute('data-event-id');
         handleEditBookingSubmission(data, eventId);
     } else {
+        console.log('Other form type:', e.target.id);
         // Outras ações
         setTimeout(() => {
             hideLoading();
@@ -848,6 +859,8 @@ function handleFormSubmit(e) {
 }
 
 function handleBookingSubmission(data) {
+    console.log('handleBookingSubmission called with:', data);
+    
     // Validar dados obrigatórios
     if (!data.title || !data.date || !data.startTime || !data.endTime || !data.room) {
         hideLoading();
@@ -918,8 +931,12 @@ function handleBookingSubmission(data) {
     
     // Adicionar evento ao calendário
     if (calendar) {
+        console.log('Adding event to calendar:', newEvent);
         calendar.addEvent(newEvent);
-        console.log('Evento adicionado ao calendário:', newEvent);
+        console.log('Event added successfully to calendar');
+        console.log('Calendar events after addition:', calendar.getEvents());
+    } else {
+        console.error('Calendar is not initialized!');
     }
     
     // Atualizar atividade recente
@@ -939,9 +956,23 @@ function handleBookingSubmission(data) {
         closeModal();
         showNotification(`Reserva "${data.title}" criada com sucesso para ${formatDate(data.date)} das ${data.startTime} às ${data.endTime}!`, 'success');
         
-        // Se estivermos na seção do calendário, garantir que está visível
-        if (document.getElementById('calendar-section').classList.contains('active')) {
+        // Forçar re-renderização do calendário para garantir que o evento apareça
+        if (calendar) {
+            console.log('Force re-rendering calendar after booking...');
             calendar.render();
+        }
+        
+        // Navegar para o calendário se não estiver nele
+        if (getCurrentSection() !== 'calendar') {
+            showSection('calendar');
+        } else {
+            // Se já estiver no calendário, garantir que está visível
+            if (calendar) calendar.render();
+        }
+        
+        // Ir para a data do evento
+        if (calendar) {
+            calendar.gotoDate(data.date);
         }
     }, 1000);
 }
