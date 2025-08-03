@@ -860,6 +860,13 @@ function handleFormSubmit(e) {
 
 function handleBookingSubmission(data) {
     console.log('handleBookingSubmission called with:', data);
+    console.log('Data recebida do formulário:', {
+        title: data.title,
+        date: data.date,
+        startTime: data.startTime,
+        endTime: data.endTime,
+        room: data.room
+    });
     
     // Validar dados obrigatórios
     if (!data.title || !data.date || !data.startTime || !data.endTime || !data.room) {
@@ -876,8 +883,19 @@ function handleBookingSubmission(data) {
     }
     
     // Verificar disponibilidade da sala
-    const requestedStart = new Date(`${data.date}T${data.startTime}:00`);
-    const requestedEnd = new Date(`${data.date}T${data.endTime}:00`);
+    const [year, month, day] = data.date.split('-');
+    const [startHour, startMinute] = data.startTime.split(':');
+    const [endHour, endMinute] = data.endTime.split(':');
+    
+    // Criar datas em horário local (sem conversão UTC)
+    const requestedStart = new Date(year, month - 1, day, startHour, startMinute);
+    const requestedEnd = new Date(year, month - 1, day, endHour, endMinute);
+    
+    console.log('Data solicitada:', data.date);
+    console.log('Horário início:', data.startTime);
+    console.log('Horário fim:', data.endTime);
+    console.log('Data início criada:', requestedStart.toLocaleString());
+    console.log('Data fim criada:', requestedEnd.toLocaleString());
     
     const conflicts = calendar.getEvents().filter(event => {
         // Verificar se é a mesma sala
@@ -898,9 +916,13 @@ function handleBookingSubmission(data) {
         return;
     }
     
-    // Criar evento para o calendário
+    // Criar evento para o calendário - usando horário local
     const startDateTime = `${data.date}T${data.startTime}:00`;
     const endDateTime = `${data.date}T${data.endTime}:00`;
+    
+    console.log('DateTime criado para evento:');
+    console.log('Start:', startDateTime);
+    console.log('End:', endDateTime);
     
     // Obter nome da sala
     const roomNames = {
