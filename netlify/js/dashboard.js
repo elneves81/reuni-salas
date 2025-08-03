@@ -7,10 +7,160 @@ const API_BASE_URL = 'https://salalivre.netlify.app/.netlify/functions';
 let currentUser = null;
 let calendar = null;
 let charts = {};
+let isMobileDevice = false;
+
+// ==================== MOBILE DETECTION ====================
+function detectMobileDevice() {
+    const userAgent = navigator.userAgent.toLowerCase();
+    const mobileKeywords = ['mobile', 'android', 'iphone', 'ipad', 'ipod', 'blackberry', 'windows phone'];
+    
+    // Detectar por User Agent
+    const isMobileUA = mobileKeywords.some(keyword => userAgent.includes(keyword));
+    
+    // Detectar por tamanho de tela
+    const isMobileScreen = window.innerWidth <= 768;
+    
+    // Detectar por touch
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    
+    isMobileDevice = isMobileUA || (isMobileScreen && isTouchDevice);
+    
+    console.log('🔍 Detecção de dispositivo móvel:', {
+        userAgent: userAgent.substring(0, 50) + '...',
+        isMobileUA: isMobileUA,
+        isMobileScreen: isMobileScreen,
+        isTouchDevice: isTouchDevice,
+        isMobileDevice: isMobileDevice,
+        screenWidth: window.innerWidth,
+        screenHeight: window.innerHeight
+    });
+    
+    return isMobileDevice;
+}
+
+function applyMobileOptimizations() {
+    if (isMobileDevice) {
+        console.log('📱 Aplicando otimizações para dispositivo móvel...');
+        
+        // Adicionar classe mobile ao body
+        document.body.classList.add('mobile-device');
+        
+        // Aplicar configurações específicas para mobile
+        applyMobileLayout();
+        applyMobileCalendar();
+        applyMobileModals();
+        applyMobileTouchOptimizations();
+        
+        console.log('✅ Otimizações móveis aplicadas com sucesso!');
+    } else {
+        console.log('💻 Dispositivo desktop detectado - usando layout padrão');
+    }
+}
+
+function applyMobileLayout() {
+    // Forçar sidebar colapsada no mobile
+    const sidebar = document.querySelector('.sidebar');
+    if (sidebar) {
+        sidebar.classList.add('mobile-collapsed');
+    }
+    
+    // Ajustar main content para mobile
+    const mainContent = document.querySelector('.main-content');
+    if (mainContent) {
+        mainContent.style.marginLeft = '0';
+        mainContent.style.width = '100%';
+    }
+    
+    // Mostrar botão de menu mobile
+    const mobileToggle = document.querySelector('.mobile-menu-toggle');
+    if (mobileToggle) {
+        mobileToggle.style.display = 'block';
+    }
+}
+
+function applyMobileCalendar() {
+    // Configurações específicas do calendário para mobile
+    if (calendar) {
+        // Forçar view de mês no mobile
+        calendar.changeView('dayGridMonth');
+        
+        // Ajustar altura do calendário
+        calendar.setOption('height', 'auto');
+        calendar.setOption('aspectRatio', 1.2);
+    }
+}
+
+function applyMobileModals() {
+    // Ajustar modais para mobile
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        modal.classList.add('mobile-modal');
+    });
+}
+
+function applyMobileTouchOptimizations() {
+    // Adicionar otimizações de toque
+    document.body.style.touchAction = 'manipulation';
+    
+    // Prevenir zoom duplo click
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function (event) {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+            event.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, false);
+}
+
+function toggleMobileMenu() {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.mobile-overlay') || createMobileOverlay();
+    
+    if (sidebar.classList.contains('mobile-show')) {
+        sidebar.classList.remove('mobile-show');
+        overlay.style.display = 'none';
+    } else {
+        sidebar.classList.add('mobile-show');
+        overlay.style.display = 'block';
+    }
+}
+
+function createMobileOverlay() {
+    const overlay = document.createElement('div');
+    overlay.className = 'mobile-overlay';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        display: none;
+    `;
+    
+    overlay.addEventListener('click', () => {
+        document.querySelector('.sidebar').classList.remove('mobile-show');
+        overlay.style.display = 'none';
+    });
+    
+    document.body.appendChild(overlay);
+    return overlay;
+}
 
 // ==================== INICIALIZAÇÃO ====================
 document.addEventListener('DOMContentLoaded', function() {
+    // Detectar dispositivo móvel primeiro
+    detectMobileDevice();
+    applyMobileOptimizations();
+    
+    // Inicializar dashboard
     initializeDashboard();
+    
+    // Listener para mudanças de orientação e redimensionamento
+    window.addEventListener('resize', handleScreenChange);
+    window.addEventListener('orientationchange', handleScreenChange);
 });
 
 function initializeDashboard() {
@@ -90,6 +240,12 @@ function setupEventListeners() {
     document.getElementById('actionModal').addEventListener('click', function(e) {
         if (e.target === this) closeModal();
     });
+    
+    // Mobile menu toggle
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    if (mobileMenuToggle) {
+        mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+    }
     
     // Calendar controls
     document.getElementById('newEventBtn').addEventListener('click', () => openModal('Nova Reserva', createBookingForm()));
@@ -1235,6 +1391,56 @@ setInterval(() => {
     loadRecentActivity();
     cleanExpiredEvents(); // Limpar eventos expirados periodicamente
 }, 60000); // Atualizar a cada minuto
+
+// ==================== RESPONSIVE HANDLING ====================
+function handleScreenChange() {
+    // Re-detectar dispositivo móvel após mudança de orientação/tela
+    setTimeout(() => {
+        const wasMobile = isMobileDevice;
+        detectMobileDevice();
+        
+        if (wasMobile !== isMobileDevice) {
+            console.log('🔄 Mudança de dispositivo detectada:', isMobileDevice ? 'Mobile' : 'Desktop');
+            
+            if (isMobileDevice) {
+                applyMobileOptimizations();
+            } else {
+                removeMobileOptimizations();
+            }
+        }
+        
+        // Re-renderizar calendário se necessário
+        if (calendar) {
+            calendar.render();
+        }
+    }, 100);
+}
+
+function removeMobileOptimizations() {
+    console.log('💻 Removendo otimizações móveis...');
+    
+    // Remover classe mobile
+    document.body.classList.remove('mobile-device');
+    
+    // Restaurar sidebar
+    const sidebar = document.querySelector('.sidebar');
+    if (sidebar) {
+        sidebar.classList.remove('mobile-collapsed', 'mobile-show');
+    }
+    
+    // Restaurar main content
+    const mainContent = document.querySelector('.main-content');
+    if (mainContent) {
+        mainContent.style.marginLeft = '';
+        mainContent.style.width = '';
+    }
+    
+    // Esconder overlay se existir
+    const overlay = document.querySelector('.mobile-overlay');
+    if (overlay) {
+        overlay.style.display = 'none';
+    }
+}
 
 // ==================== EVENT MANAGEMENT ====================
 function editEvent(eventId) {

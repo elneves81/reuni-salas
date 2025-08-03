@@ -1317,3 +1317,187 @@ body {
         flex-direction: column;
     }
 }
+
+/* ==================== MOBILE DEVICE OPTIMIZATIONS ==================== */
+.mobile-device {
+    font-size: 16px; /* Prevenir zoom automático no iOS */
+}
+
+.mobile-device .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+}
+
+.mobile-device .sidebar.mobile-show {
+    transform: translateX(0);
+    z-index: 1001;
+}
+
+.mobile-device .main-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding: 1rem;
+}
+
+.mobile-device .header {
+    padding: 0.5rem 1rem;
+}
+
+.mobile-device .mobile-menu-toggle {
+    display: block !important;
+}
+
+.mobile-device .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.mobile-device .kpi-card {
+    padding: 1rem;
+}
+
+.mobile-device .kpi-value {
+    font-size: 1.5rem;
+}
+
+.mobile-device .calendar-header {
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.mobile-device .calendar-controls {
+    justify-content: center;
+}
+
+.mobile-device .view-controls {
+    justify-content: center;
+}
+
+.mobile-device .view-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+.mobile-device .modal-content {
+    width: 95% !important;
+    margin: 2rem auto;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.mobile-device .modal-form {
+    padding: 1rem;
+}
+
+.mobile-device .form-row {
+    flex-direction: column;
+}
+
+.mobile-device .form-group {
+    margin-bottom: 1rem;
+}
+
+.mobile-device input,
+.mobile-device select,
+.mobile-device textarea {
+    font-size: 16px; /* Prevenir zoom automático */
+    padding: 0.75rem;
+}
+
+.mobile-device .btn-primary,
+.mobile-device .btn-secondary {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+.mobile-device .form-actions {
+    flex-direction: column-reverse;
+}
+
+.mobile-device .quick-actions-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.mobile-device .quick-action-btn {
+    padding: 1.5rem 1rem;
+}
+
+.mobile-device .chart-container {
+    height: 250px;
+}
+
+.mobile-device .activity-list {
+    max-height: 200px;
+}
+
+.mobile-device .table-responsive {
+    font-size: 0.875rem;
+}
+
+.mobile-device .table th,
+.mobile-device .table td {
+    padding: 0.5rem;
+}
+
+/* Touch optimizations */
+.mobile-device button,
+.mobile-device .btn,
+.mobile-device .sidebar-link,
+.mobile-device .view-btn {
+    min-height: 44px; /* Tamanho mínimo recomendado para toque */
+    touch-action: manipulation;
+}
+
+/* Mobile calendar optimizations */
+.mobile-device .fc-toolbar {
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.mobile-device .fc-toolbar-chunk {
+    display: flex;
+    justify-content: center;
+}
+
+.mobile-device .fc-button {
+    padding: 0.5rem;
+    min-height: 44px;
+}
+
+.mobile-device .fc-daygrid-event {
+    font-size: 0.75rem;
+    padding: 2px 4px;
+}
+
+/* Mobile notification optimizations */
+.mobile-device .notification {
+    width: 95%;
+    left: 2.5%;
+    right: 2.5%;
+}
+
+/* Improve scroll on mobile */
+.mobile-device {
+    -webkit-overflow-scrolling: touch;
+}
+
+.mobile-device .content-section {
+    min-height: calc(100vh - 120px);
+}
+
+/* Hide desktop-only elements on mobile */
+.mobile-device .desktop-only {
+    display: none !important;
+}
+
+/* Mobile-specific utilities */
+.mobile-only {
+    display: none;
+}
+
+.mobile-device .mobile-only {
+    display: block;
+}
