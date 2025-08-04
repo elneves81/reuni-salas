@@ -92,9 +92,11 @@ class GlobalSearchManager {
         `;
 
         // Inserir no header
-        const headerContent = document.querySelector('.header-content');
-        if (headerContent) {
-            headerContent.appendChild(searchContainer);
+        const globalSearchContainer = document.getElementById('globalSearchContainer');
+        if (globalSearchContainer) {
+            globalSearchContainer.appendChild(searchContainer);
+        } else {
+            console.warn('🔍 Container globalSearchContainer não encontrado');
         }
     }
 
@@ -103,6 +105,12 @@ class GlobalSearchManager {
         const searchFilterBtn = document.getElementById('searchFilterBtn');
         const searchClearBtn = document.getElementById('searchClearBtn');
         const searchFilters = document.getElementById('searchFilters');
+
+        // Verificar se os elementos existem
+        if (!searchInput) {
+            console.warn('🔍 Elemento globalSearchInput não encontrado');
+            return;
+        }
 
         // Input de busca
         let searchTimeout;
@@ -115,7 +123,9 @@ class GlobalSearchManager {
                 return;
             }
 
-            searchClearBtn.style.display = 'block';
+            if (searchClearBtn) {
+                searchClearBtn.style.display = 'block';
+            }
 
             if (query.length < 2) {
                 this.showSuggestions(query);
@@ -128,37 +138,48 @@ class GlobalSearchManager {
         });
 
         // Botão de filtros
-        searchFilterBtn.addEventListener('click', () => {
-            searchFilters.style.display = searchFilters.style.display === 'none' ? 'block' : 'none';
-        });
+        if (searchFilterBtn && searchFilters) {
+            searchFilterBtn.addEventListener('click', () => {
+                searchFilters.style.display = searchFilters.style.display === 'none' ? 'block' : 'none';
+            });
+        }
 
         // Botão limpar
-        searchClearBtn.addEventListener('click', () => {
-            this.clearSearch();
-        });
+        if (searchClearBtn) {
+            searchClearBtn.addEventListener('click', () => {
+                this.clearSearch();
+            });
+        }
 
         // Mudança de filtros
-        searchFilters.addEventListener('change', () => {
-            const query = searchInput.value.trim();
-            if (query.length >= 2) {
-                this.performSearch(query);
-            }
-        });
+        if (searchFilters) {
+            searchFilters.addEventListener('change', () => {
+                const query = searchInput.value.trim();
+                if (query.length >= 2) {
+                    this.performSearch(query);
+                }
+            });
+        }
 
         // Sort
         const searchSort = document.getElementById('searchSort');
-        searchSort.addEventListener('change', () => {
-            const query = searchInput.value.trim();
-            if (query.length >= 2) {
-                this.performSearch(query);
-            }
-        });
+        if (searchSort) {
+            searchSort.addEventListener('change', () => {
+                const query = searchInput.value.trim();
+                if (query.length >= 2) {
+                    this.performSearch(query);
+                }
+            });
+        }
 
         // Clique fora para fechar
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.global-search-container')) {
-                document.getElementById('searchSuggestions').style.display = 'none';
-                document.getElementById('searchFilters').style.display = 'none';
+                const searchSuggestions = document.getElementById('searchSuggestions');
+                const searchFilters = document.getElementById('searchFilters');
+                
+                if (searchSuggestions) searchSuggestions.style.display = 'none';
+                if (searchFilters) searchFilters.style.display = 'none';
             }
         });
     }

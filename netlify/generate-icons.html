@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Ícones PWA - Sala Livre</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .icon-item {
+            text-align: center;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .icon-preview {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 10px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: white;
+            font-size: 48px;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        button:hover {
+            background: #1d4ed8;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            background: #f0f9ff;
+            border: 1px solid #0ea5e9;
+            color: #0c4a6e;
+        }
+        .generated {
+            background: #f0fdf4;
+            border-color: #22c55e;
+            color: #14532d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Gerador de Ícones PWA - Sala Livre</h1>
+        <p>Este gerador criará todos os ícones necessários para o PWA funcionar corretamente.</p>
+        
+        <div class="icon-preview">
+            <i class="fas fa-calendar-check" style="font-size: 48px;"></i>
+        </div>
+
+        <button onclick="generateAllIcons()">📱 Gerar Todos os Ícones</button>
+        <button onclick="downloadManifest()">📄 Baixar Manifest Atualizado</button>
+
+        <div id="status" class="status" style="display: none;">
+            Gerando ícones...
+        </div>
+
+        <div class="icon-grid" id="iconGrid" style="display: none;">
+            <!-- Ícones gerados aparecerão aqui -->
+        </div>
+    </div>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        // Tamanhos de ícones necessários para PWA
+        const iconSizes = [
+            { size: 16, name: 'icon-16x16.png' },
+            { size: 32, name: 'icon-32x32.png' },
+            { size: 57, name: 'icon-57x57.png' },
+            { size: 60, name: 'icon-60x60.png' },
+            { size: 72, name: 'icon-72x72.png' },
+            { size: 76, name: 'icon-76x76.png' },
+            { size: 96, name: 'icon-96x96.png' },
+            { size: 114, name: 'icon-114x114.png' },
+            { size: 120, name: 'icon-120x120.png' },
+            { size: 128, name: 'icon-128x128.png' },
+            { size: 144, name: 'icon-144x144.png' },
+            { size: 152, name: 'icon-152x152.png' },
+            { size: 180, name: 'icon-180x180.png' },
+            { size: 192, name: 'icon-192x192.png' },
+            { size: 384, name: 'icon-384x384.png' },
+            { size: 512, name: 'icon-512x512.png' }
+        ];
+
+        function createIconCanvas(size) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = size;
+            canvas.height = size;
+            
+            // Background gradient
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#2563eb');
+            gradient.addColorStop(1, '#3b82f6');
+            
+            // Background com bordas arredondadas
+            const radius = size * 0.2;
+            ctx.fillStyle = gradient;
+            roundRect(ctx, 0, 0, size, size, radius);
+            ctx.fill();
+            
+            // Ícone de calendário
+            ctx.fillStyle = 'white';
+            ctx.font = `bold ${size * 0.5}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('📅', size / 2, size / 2);
+            
+            return canvas;
+        }
+
+        function roundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.arcTo(x + width, y, x + width, y + height, radius);
+            ctx.arcTo(x + width, y + height, x, y + height, radius);
+            ctx.arcTo(x, y + height, x, y, radius);
+            ctx.arcTo(x, y, x + width, y, radius);
+            ctx.closePath();
+        }
+
+        function downloadCanvas(canvas, filename) {
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        function generateAllIcons() {
+            const status = document.getElementById('status');
+            const iconGrid = document.getElementById('iconGrid');
+            
+            status.style.display = 'block';
+            status.className = 'status';
+            status.innerHTML = '⏳ Gerando ícones...';
+            
+            iconGrid.innerHTML = '';
+            
+            let generated = 0;
+            
+            iconSizes.forEach((iconInfo, index) => {
+                setTimeout(() => {
+                    const canvas = createIconCanvas(iconInfo.size);
+                    
+                    // Adicionar preview na grid
+                    const iconItem = document.createElement('div');
+                    iconItem.className = 'icon-item';
+                    iconItem.innerHTML = `
+                        <div style="width: 60px; height: 60px; margin: 0 auto 10px;">
+                            <canvas width="${iconInfo.size}" height="${iconInfo.size}" style="width: 60px; height: 60px; border-radius: 12px;"></canvas>
+                        </div>
+                        <h4>${iconInfo.size}x${iconInfo.size}</h4>
+                        <button onclick="downloadSingleIcon(${iconInfo.size}, '${iconInfo.name}')">
+                            💾 Baixar
+                        </button>
+                    `;
+                    
+                    const previewCanvas = iconItem.querySelector('canvas');
+                    const previewCtx = previewCanvas.getContext('2d');
+                    previewCtx.drawImage(canvas, 0, 0, iconInfo.size, iconInfo.size);
+                    
+                    iconGrid.appendChild(iconItem);
+                    
+                    generated++;
+                    status.innerHTML = `⏳ Gerando ícones... ${generated}/${iconSizes.length}`;
+                    
+                    if (generated === iconSizes.length) {
+                        status.className = 'status generated';
+                        status.innerHTML = `✅ ${iconSizes.length} ícones gerados com sucesso! Clique em "Baixar" para salvar cada ícone.`;
+                        iconGrid.style.display = 'grid';
+                    }
+                }, index * 100);
+            });
+        }
+
+        function downloadSingleIcon(size, filename) {
+            const canvas = createIconCanvas(size);
+            downloadCanvas(canvas, filename);
+        }
+
+        function downloadManifest() {
+            const manifest = {
+                "name": "Sala Livre - Sistema de Reservas",
+                "short_name": "Sala Livre",
+                "description": "Sistema completo de gestão de salas de reunião e reservas",
+                "start_url": "/dashboard.html",
+                "display": "standalone",
+                "background_color": "#ffffff",
+                "theme_color": "#2563eb",
+                "orientation": "portrait-primary",
+                "scope": "/",
+                "lang": "pt-BR",
+                "categories": ["business", "productivity"],
+                "icons": iconSizes.map(icon => ({
+                    "src": `images/${icon.name}`,
+                    "sizes": `${icon.size}x${icon.size}`,
+                    "type": "image/png",
+                    "purpose": icon.size >= 192 ? "any" : "maskable any"
+                })),
+                "shortcuts": [
+                    {
+                        "name": "Nova Reserva",
+                        "short_name": "Reservar",
+                        "description": "Criar uma nova reserva rapidamente",
+                        "url": "/dashboard.html?action=new-booking",
+                        "icons": [{"src": "images/icon-96x96.png", "sizes": "96x96"}]
+                    },
+                    {
+                        "name": "Minhas Reservas",
+                        "short_name": "Reservas",
+                        "description": "Ver suas reservas ativas",
+                        "url": "/dashboard.html?section=bookings",
+                        "icons": [{"src": "images/icon-96x96.png", "sizes": "96x96"}]
+                    },
+                    {
+                        "name": "Salas Disponíveis",
+                        "short_name": "Salas",
+                        "description": "Verificar disponibilidade das salas",
+                        "url": "/dashboard.html?section=rooms",
+                        "icons": [{"src": "images/icon-96x96.png", "sizes": "96x96"}]
+                    }
+                ],
+                "related_applications": [],
+                "prefer_related_applications": false,
+                "features": [
+                    "Cross Platform",
+                    "Fast",
+                    "Offline Support"
+                ]
+            };
+
+            const blob = new Blob([JSON.stringify(manifest, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'manifest.json';
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Gerar ícones automaticamente ao carregar a página
+        window.addEventListener('load', () => {
+            setTimeout(generateAllIcons, 1000);
+        });
+    </script>
+</body>
+</html>
