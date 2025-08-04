@@ -15,9 +15,12 @@ class NotificationSystem {
     }
 
     createNotificationPanel() {
+        console.log('🏗️ Criando painel de notificações...');
+        
         // Remover painel existente se houver
         const existingPanel = document.getElementById('notificationPanel');
         if (existingPanel) {
+            console.log('🗑️ Removendo painel existente');
             existingPanel.remove();
         }
 
@@ -50,34 +53,74 @@ class NotificationSystem {
                 <!-- Notifications will be populated here -->
             </div>
         `;
+        
+        // Anexar ao body
         document.body.appendChild(panel);
-        console.log('📋 Painel de notificações criado');
+        console.log('✅ Painel criado e anexado ao body');
+        
+        // Verificar se foi criado corretamente
+        const createdPanel = document.getElementById('notificationPanel');
+        console.log('🔍 Painel verificado:', !!createdPanel);
+        
+        return panel;
     }
 
     setupEventListeners() {
         // Aguardar um pouco para garantir que o DOM está completamente carregado
-        setTimeout(() => {
-            // Botão de notificações no header
+        console.log('🔧 Configurando event listeners...');
+        
+        const setupButton = () => {
             const notificationBtn = document.getElementById('notificationsBtn');
-            console.log('🔔 Botão de notificações encontrado:', notificationBtn);
+            console.log('🔔 Tentando encontrar botão:', notificationBtn);
             
             if (notificationBtn) {
-                // Remover listeners existentes
-                notificationBtn.replaceWith(notificationBtn.cloneNode(true));
-                const newNotificationBtn = document.getElementById('notificationsBtn');
+                // Remover listeners existentes para evitar duplicatas
+                const newBtn = notificationBtn.cloneNode(true);
+                notificationBtn.parentNode.replaceChild(newBtn, notificationBtn);
                 
-                newNotificationBtn.addEventListener('click', (e) => {
+                newBtn.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('🔔 Clique no sino detectado!');
+                    console.log('🔔 CLIQUE NO SINO DETECTADO!');
+                    console.log('🔔 Event target:', e.target);
+                    console.log('🔔 notificationSystem:', this);
                     this.togglePanel();
                 });
                 
-                console.log('✅ Event listener adicionado ao botão de notificações');
+                // Adicionar visual feedback
+                newBtn.addEventListener('mouseenter', () => {
+                    newBtn.style.transform = 'scale(1.1)';
+                });
+                
+                newBtn.addEventListener('mouseleave', () => {
+                    newBtn.style.transform = 'scale(1.0)';
+                });
+                
+                console.log('✅ Event listener configurado com sucesso!');
+                return true;
             } else {
                 console.error('❌ Botão de notificações não encontrado!');
+                return false;
             }
+        };
 
+        // Tentar configurar imediatamente
+        if (!setupButton()) {
+            // Se não conseguir, tentar novamente após um delay
+            setTimeout(() => {
+                console.log('🔄 Tentativa 2 de configurar botão...');
+                if (!setupButton()) {
+                    // Última tentativa
+                    setTimeout(() => {
+                        console.log('🔄 Tentativa 3 de configurar botão...');
+                        setupButton();
+                    }, 1000);
+                }
+            }, 500);
+        }
+
+        // Configurar filtros quando o painel for criado
+        setTimeout(() => {
             // Filtros de notificação
             document.addEventListener('click', (e) => {
                 if (e.target.classList.contains('filter-btn')) {
@@ -331,23 +374,74 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Função de debug para teste manual
     window.testNotifications = function() {
-        console.log('🧪 Testando sistema de notificações...');
+        console.log('🧪 === TESTE COMPLETO DO SISTEMA ===');
         console.log('📋 notificationSystem existe:', !!notificationSystem);
         
         const btn = document.getElementById('notificationsBtn');
         console.log('🔔 Botão encontrado:', !!btn);
+        console.log('🔔 Botão elemento:', btn);
+        
+        if (btn) {
+            console.log('🔔 Botão classes:', btn.classList.toString());
+            console.log('🔔 Botão parent:', btn.parentElement);
+        }
+        
+        const panel = document.getElementById('notificationPanel');
+        console.log('📋 Painel existe:', !!panel);
         
         if (notificationSystem) {
+            console.log('🔧 Chamando togglePanel...');
             notificationSystem.togglePanel();
+        }
+        
+        return {
+            system: !!notificationSystem,
+            button: !!btn,
+            panel: !!panel
+        };
+    };
+    
+    // Função para forçar clique no botão
+    window.clickNotificationButton = function() {
+        const btn = document.getElementById('notificationsBtn');
+        if (btn) {
+            console.log('🖱️ Simulando clique no botão...');
+            btn.click();
+        } else {
+            console.error('❌ Botão não encontrado para clique!');
         }
     };
     
     // Adicionar algumas notificações de exemplo
     setTimeout(() => {
         console.log('📨 Adicionando notificações de exemplo...');
-        notificationSystem.notifySystemUpdate('Sistema atualizado com sucesso!');
-        notificationSystem.addNotification('info', 'Bem-vindo!', 'Sistema Sala Livre carregado com sucesso');
+        if (notificationSystem) {
+            notificationSystem.notifySystemUpdate('Sistema atualizado com sucesso!');
+            notificationSystem.addNotification('info', 'Bem-vindo!', 'Sistema Sala Livre carregado com sucesso');
+            
+            // Teste automático após 3 segundos
+            setTimeout(() => {
+                console.log('🤖 Executando teste automático...');
+                window.testNotifications();
+            }, 3000);
+        }
     }, 2000);
     
     console.log('✅ Sistema de notificações inicializado');
 });
+
+// Função global para debugging
+window.debugNotifications = function() {
+    console.log('🐛 === DEBUG DETALHADO ===');
+    console.log('📱 Usuário:', navigator.userAgent);
+    console.log('📋 DOM carregado:', document.readyState);
+    console.log('🔔 Botão HTML:', document.getElementById('notificationsBtn')?.outerHTML);
+    console.log('📋 Painel HTML:', document.getElementById('notificationPanel')?.outerHTML || 'Não existe');
+    console.log('🌐 notificationSystem global:', window.notificationSystem);
+    
+    // Tentar recriar o event listener
+    if (window.notificationSystem) {
+        console.log('🔧 Recriando event listeners...');
+        window.notificationSystem.setupEventListeners();
+    }
+};
