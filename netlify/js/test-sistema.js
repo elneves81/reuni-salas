@@ -47,17 +47,32 @@ async function testeRapidoSistema() {
         console.log('❌ Sistema de notificações não carregado');
     }
     
-    // 4. Verificar calendário
+    // 4. Verificar calendário (com aguardar)
     console.log('4. Verificando calendário...');
-    if (window.calendar) {
-        console.log('✅ Calendário FullCalendar inicializado');
-        const eventos = window.calendar.getEvents();
-        console.log('📅 Eventos no calendário:', eventos.length);
-    } else {
-        console.log('❌ Calendário não inicializado');
-    }
+    await waitForCalendar();
     
     console.log('🧪 === FIM DO TESTE ===');
+}
+
+// Função para aguardar o calendário estar pronto
+async function waitForCalendar(maxTries = 5) {
+    for (let i = 0; i < maxTries; i++) {
+        if (window.calendar && typeof window.calendar.getEvents === 'function') {
+            console.log('✅ Calendário FullCalendar inicializado');
+            try {
+                const eventos = window.calendar.getEvents();
+                console.log('📅 Eventos no calendário:', eventos.length);
+                return;
+            } catch (error) {
+                console.log('⚠️ Erro ao obter eventos:', error.message);
+            }
+        }
+        
+        console.log(`⏳ Aguardando calendário... (tentativa ${i + 1}/${maxTries})`);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    
+    console.log('❌ Calendário não ficou disponível após aguardar');
 }
 
 // Executar teste quando página carregar
@@ -68,5 +83,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Tornar função disponível globalmente para teste manual
 window.testeRapidoSistema = testeRapidoSistema;
+window.waitForCalendar = waitForCalendar;
 
 console.log('🧪 Teste do sistema carregado! Execute testeRapidoSistema() para verificar.');

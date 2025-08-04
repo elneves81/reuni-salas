@@ -646,6 +646,9 @@ function initializeCalendar() {
     // Renderizar o calendário
     calendar.render();
     
+    // Expor o calendário globalmente para testes
+    window.calendar = calendar;
+    
     // Inicializar navegação do calendário
     initCalendarNavigation();
     
