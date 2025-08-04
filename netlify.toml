@@ -14,7 +14,50 @@
   # Variáveis de ambiente para o frontend
   NODE_VERSION = "18"
 
-# Redirecionamentos e regras
+# Redirecionamentos e regras para API com Google Cloud SQL
+[[redirects]]
+  # Health Check
+  from = "/api/health"
+  to = "/.netlify/functions/health"
+  status = 200
+
+[[redirects]]
+  # Usuários API
+  from = "/api/users"
+  to = "/.netlify/functions/users"
+  status = 200
+
+[[redirects]]
+  # Usuário específico
+  from = "/api/users/*"
+  to = "/.netlify/functions/users?id=:splat"
+  status = 200
+
+[[redirects]]
+  # Reuniões API
+  from = "/api/bookings"
+  to = "/.netlify/functions/bookings"
+  status = 200
+
+[[redirects]]
+  # Reunião específica
+  from = "/api/bookings/*"
+  to = "/.netlify/functions/bookings?id=:splat"
+  status = 200
+
+[[redirects]]
+  # Salas API
+  from = "/api/rooms"
+  to = "/.netlify/functions/rooms"
+  status = 200
+
+[[redirects]]
+  # Sala específica
+  from = "/api/rooms/*"
+  to = "/.netlify/functions/rooms?id=:splat"
+  status = 200
+
+# Funções de autenticação (mantidas para compatibilidade)
 [[redirects]]
   # Login function (simples)
   from = "/login"
@@ -28,12 +71,6 @@
   status = 200
 
 [[redirects]]
-  # Test function
-  from = "/test"
-  to = "/.netlify/functions/test"
-  status = 200
-
-[[redirects]]
   # Legacy API routes
   from = "/api/auth/login"
   to = "/.netlify/functions/login-simple"
@@ -42,11 +79,6 @@
 [[redirects]]
   from = "/api/auth/register"
   to = "/.netlify/functions/register"
-  status = 200
-
-[[redirects]]
-  from = "/.netlify/functions/login"
-  to = "/.netlify/functions/login-simple"
   status = 200
 
 [[redirects]]

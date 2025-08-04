@@ -164,32 +164,86 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initializeDashboard() {
+    console.log('🚀 Inicializando Dashboard...');
+    
     // Verificar autenticação
     checkAuthentication();
     
     // Configurar event listeners
     setupEventListeners();
     
-    // Inicializar componentes
-    initializeCharts();
-    initializeCalendar();
-    loadDashboardData();
+    // Aguardar API estar disponível antes de inicializar componentes que dependem dela
+    waitForAPI().then(() => {
+        console.log('✅ API disponível, inicializando componentes...');
+        
+        // Inicializar componentes
+        initializeCharts();
+        initializeCalendar();
+        loadDashboardData();
+        
+        // Inicializar novas seções
+        initializeBookingsSection();
+        initializeUsersSection();
+        initializeReportsSection();
+        initializeSettingsSection();
+        
+        // Verificar dados do usuário
+        loadUserData();
+    }).catch(() => {
+        console.log('⚠️ API não disponível, usando modo offline...');
+        
+        // Inicializar em modo offline
+        initializeCharts();
+        initializeCalendar();
+        loadDashboardData();
+        
+        // Inicializar novas seções em modo limitado
+        initializeBookingsSection();
+        initializeUsersSection();
+        initializeReportsSection();
+        initializeSettingsSection();
+        
+        // Verificar dados do usuário
+        loadUserData();
+    });
     
-    // Inicializar novas seções
-    initializeBookingsSection();
-    initializeUsersSection();
-    initializeReportsSection();
-    initializeSettingsSection();
-    
-    // Configurar sidebar
+    // Configurar sidebar (não depende da API)
     setupSidebar();
-    
-    // Verificar dados do usuário
-    loadUserData();
+}
+
+// Aguardar API estar disponível
+function waitForAPI(timeout = 5000) {
+    return new Promise((resolve, reject) => {
+        const startTime = Date.now();
+        
+        function checkAPI() {
+            if (window.salaLivreAPI && window.salaLivreAPI.isReady) {
+                resolve();
+                return;
+            }
+            
+            if (Date.now() - startTime > timeout) {
+                reject(new Error('API timeout'));
+                return;
+            }
+            
+            setTimeout(checkAPI, 100);
+        }
+        
+        checkAPI();
+    });
 }
 
 // ==================== AUTENTICAÇÃO ====================
 function checkAuthentication() {
+    // Verificar se API está disponível e usuário autenticado
+    if (window.salaLivreAPI && window.salaLivreAPI.isAuthenticated()) {
+        currentUser = window.salaLivreAPI.getCurrentUser();
+        updateUserDisplay();
+        return;
+    }
+    
+    // Fallback para sistema antigo
     const token = localStorage.getItem('authToken');
     const userData = localStorage.getItem('userData');
     
@@ -210,13 +264,39 @@ function checkAuthentication() {
 function updateUserDisplay() {
     if (currentUser) {
         document.getElementById('userName').textContent = currentUser.name || 'Usuário';
-        document.getElementById('userRole').textContent = currentUser.role || 'User';
+        document.getElementById('userRole').textContent = getRoleDisplayName(currentUser.role) || 'User';
+        
+        // Atualizar elementos de admin
+        updateAdminElements();
     }
 }
 
+function getRoleDisplayName(role) {
+    const roles = {
+        'admin': 'Administrador',
+        'manager': 'Gerente', 
+        'user': 'Usuário'
+    };
+    return roles[role] || role;
+}
+
+function updateAdminElements() {
+    const isAdmin = window.salaLivreAPI ? window.salaLivreAPI.isAdmin() : (currentUser.role === 'admin');
+    
+    // Mostrar/ocultar elementos admin
+    const adminElements = document.querySelectorAll('.admin-only, [data-admin-only]');
+    adminElements.forEach(el => {
+        el.style.display = isAdmin ? '' : 'none';
+    });
+}
+
 function logout() {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userData');
+    if (window.salaLivreAPI) {
+        window.salaLivreAPI.logout();
+    } else {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userData');
+    }
     window.location.href = '/index.html';
 }
 
@@ -604,9 +684,34 @@ function updateCalendarTitle(date) {
 }
 
 // ==================== EVENT PERSISTENCE ====================
-function saveEvent(eventData) {
+async function saveEvent(eventData) {
     console.log('Salvando evento:', eventData);
     
+    // Se API disponível, usar API
+    if (window.salaLivreAPI && window.salaLivreAPI.isAuthenticated()) {
+        try {
+            const response = await window.salaLivreAPI.createBooking(eventData);
+            if (response.success) {
+                console.log('✅ Evento salvo na API:', response.data);
+                // Notificar sistema de notificações
+                if (window.notificationSystem) {
+                    window.notificationSystem.addNotification('success', 'Calendário', 'Reunião agendada com sucesso!');
+                }
+                return response.data;
+            } else {
+                console.error('❌ Erro ao salvar na API:', response.message);
+                throw new Error(response.message);
+            }
+        } catch (error) {
+            console.error('❌ Erro ao salvar evento:', error);
+            if (window.notificationSystem) {
+                window.notificationSystem.addNotification('error', 'Calendário', 'Erro ao agendar reunião: ' + error.message);
+            }
+            throw error;
+        }
+    }
+    
+    // Fallback para localStorage
     let savedEvents = JSON.parse(localStorage.getItem('salalivre_events') || '[]');
     
     // Adicionar timestamp de criação se não existir
@@ -617,10 +722,17 @@ function saveEvent(eventData) {
     savedEvents.push(eventData);
     localStorage.setItem('salalivre_events', JSON.stringify(savedEvents));
     
-    console.log('Evento salvo. Total de eventos:', savedEvents.length);
+    console.log('Evento salvo no localStorage. Total de eventos:', savedEvents.length);
+    return eventData;
 }
 
 function loadSavedEvents() {
+    // Se API disponível, usar dados da API
+    if (window.salaLivreAPI && window.salaLivreAPI.isAuthenticated()) {
+        return window.salaLivreAPI.getCalendarEvents();
+    }
+    
+    // Fallback para localStorage
     const savedEvents = JSON.parse(localStorage.getItem('salalivre_events') || '[]');
     console.log('Carregando eventos salvos:', savedEvents.length);
     

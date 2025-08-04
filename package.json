@@ -9,7 +9,13 @@
     "setup-db": "node setup/database.js",
     "setup-google": "node setup-google.js",
     "test-db": "node test-google-cloud.js",
-    "deploy": "gcloud app deploy"
+    "deploy": "gcloud app deploy",
+    "deploy:heroku": "git push heroku main",
+    "deploy:railway": "railway up"
+  },
+  "engines": {
+    "node": "18.x",
+    "npm": "9.x"
   },
   "keywords": [
     "agenda",
