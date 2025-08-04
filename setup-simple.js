@@ -21,7 +21,7 @@ async function setupDatabase() {
 
         // Usar o database
         console.log('🏗️ Selecionando database sala_livre...');
-        await connection.execute('USE sala_livre');
+        await connection.execute('USE reuni-dep');
         console.log('✅ Database selecionado!');
 
         // Criar tabela de usuários

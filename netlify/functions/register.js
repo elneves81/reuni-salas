@@ -67,10 +67,10 @@ exports.handler = async (event, context) => {
 
         // Conectar ao banco Google Cloud SQL
         const connection = await mysql.createConnection({
-            host: '34.45.56.79',
+            host: '35.184.206.243',
             user: 'app_user',
             password: 'Neves@2025',
-            database: 'sala_livre',
+            database: 'reuni-dep',
             port: 3306
         });
 

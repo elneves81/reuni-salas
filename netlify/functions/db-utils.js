@@ -4,15 +4,18 @@ const mysql = require('mysql2/promise');
 
 // Configuração do banco (usando variáveis de ambiente do Netlify)
 const dbConfig = {
-    host: process.env.DB_HOST || '34.45.56.79',
-    user: process.env.DB_USER || 'app_user', 
-    password: process.env.DB_PASS || process.env.DB_PASSWORD,
-    database: process.env.DB_NAME || 'sala_livre',
+    host: process.env.DB_HOST || '35.184.206.243',
+    user: process.env.DB_USER || 'root', 
+    password: process.env.DB_PASS || process.env.DB_PASSWORD || 'Neves2025@',
+    database: process.env.DB_NAME || 'reuni-dep',
     port: process.env.DB_PORT || 3306,
     connectTimeout: 60000,
     acquireTimeout: 60000,
     timeout: 60000,
-    reconnect: true
+    reconnect: true,
+    ssl: {
+        rejectUnauthorized: false
+    }
 };
 
 // Pool de conexões

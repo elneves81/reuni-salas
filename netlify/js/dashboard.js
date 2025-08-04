@@ -1763,12 +1763,71 @@ function handleEditBookingSubmission(data, eventId) {
 let bookingsData = [];
 
 function initializeBookingsSection() {
-    loadBookingsData();
+    loadBookingsData(); // async function
     setupBookingsEventListeners();
 }
 
-function loadBookingsData() {
-    // Simular dados de reservas
+async function loadBookingsData() {
+    console.log('📅 Carregando dados de reservas...');
+    
+    // Tentar carregar da API primeiro
+    if (window.apiClient) {
+        try {
+            const reservas = await window.apiClient.get('/bookings');
+            console.log('✅ Reservas carregadas da API:', reservas.length);
+            
+            // Formatar dados para a tabela
+            bookingsData = reservas.map(reserva => ({
+                id: reserva.id,
+                title: reserva.title || reserva.subject,
+                room: reserva.room_name || `Sala ${reserva.room_id}`,
+                date: reserva.start_time ? reserva.start_time.split('T')[0] : reserva.date,
+                startTime: reserva.start_time ? formatTimeFromISO(reserva.start_time) : reserva.start_time,
+                endTime: reserva.end_time ? formatTimeFromISO(reserva.end_time) : reserva.end_time,
+                organizer: reserva.organizer_name || reserva.organizer,
+                status: reserva.status || 'confirmed',
+                participants: reserva.participants,
+                description: reserva.description,
+                equipment: reserva.equipment,
+                created_at: reserva.created_at
+            }));
+            
+            renderBookingsTable();
+            updateBookingsStats();
+            return;
+            
+        } catch (error) {
+            console.error('❌ Erro ao carregar reservas da API:', error);
+            
+            // Tentar carregar do cache
+            const cachedBookings = localStorage.getItem('cachedBookings');
+            if (cachedBookings) {
+                try {
+                    const reservas = JSON.parse(cachedBookings);
+                    bookingsData = reservas.map(reserva => ({
+                        id: reserva.id,
+                        title: reserva.title || reserva.subject,
+                        room: reserva.room_name || `Sala ${reserva.room_id}`,
+                        date: reserva.start_time ? reserva.start_time.split('T')[0] : reserva.date,
+                        startTime: reserva.start_time ? formatTimeFromISO(reserva.start_time) : reserva.start_time,
+                        endTime: reserva.end_time ? formatTimeFromISO(reserva.end_time) : reserva.end_time,
+                        organizer: reserva.organizer_name || reserva.organizer,
+                        status: reserva.status || 'confirmed'
+                    }));
+                    
+                    console.log('📦 Reservas carregadas do cache:', bookingsData.length);
+                    renderBookingsTable();
+                    updateBookingsStats();
+                    return;
+                } catch (cacheError) {
+                    console.error('❌ Erro ao carregar cache:', cacheError);
+                }
+            }
+        }
+    }
+    
+    // Fallback para dados de demonstração
+    console.log('📝 Usando dados de demonstração');
     bookingsData = [
         {
             id: 'BK001',
@@ -1803,6 +1862,38 @@ function loadBookingsData() {
     ];
     
     renderBookingsTable();
+    updateBookingsStats();
+}
+
+// Função auxiliar para formatar hora ISO para HH:MM
+function formatTimeFromISO(isoString) {
+    try {
+        const date = new Date(isoString);
+        return date.toLocaleTimeString('pt-BR', { 
+            hour: '2-digit', 
+            minute: '2-digit',
+            hour12: false 
+        });
+    } catch (error) {
+        return isoString;
+    }
+}
+
+// Função para atualizar estatísticas das reservas
+function updateBookingsStats() {
+    const today = new Date().toISOString().split('T')[0];
+    const todayBookings = bookingsData.filter(booking => booking.date === today);
+    
+    // Atualizar contador de reservas de hoje
+    const todayElement = document.getElementById('todayBookings');
+    if (todayElement) {
+        todayElement.textContent = todayBookings.length;
+    }
+}
+
+// Expor função loadBookingsData globalmente para o sistema de sync
+if (typeof window !== 'undefined') {
+    window.loadBookingsData = loadBookingsData;
 }
 
 function renderBookingsTable() {

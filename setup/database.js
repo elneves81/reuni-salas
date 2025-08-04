@@ -4,14 +4,14 @@ require('dotenv').config();
 
 // ==================== CONFIGURAÇÕES ====================
 const dbConfig = {
-    host: process.env.DB_HOST || 'localhost',
+    host: process.env.DB_HOST || '35.184.206.243',
     port: process.env.DB_PORT || 3306,
     user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
+    password: process.env.DB_PASSWORD || 'Neves2025@',
     multipleStatements: true
 };
 
-const databaseName = process.env.DB_NAME || 'sala_livre';
+const databaseName = process.env.DB_NAME || 'reuni-dep';
 
 // ==================== SQL PARA CRIAÇÃO DAS TABELAS ====================
 const createDatabaseSQL = `CREATE DATABASE IF NOT EXISTS ${databaseName} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`;

@@ -91,6 +91,12 @@ class AutoSyncSystem {
                 console.log(`📅 ${reunioes.length} reuniões sincronizadas no calendário`);
             }
             
+            // Atualizar tabela de reservas se presente
+            if (typeof window.loadBookingsData === 'function') {
+                console.log('🔄 Atualizando tabela de reservas...');
+                await window.loadBookingsData();
+            }
+            
             // Salvar no localStorage para backup
             localStorage.setItem('cachedBookings', JSON.stringify(reunioes));
             
