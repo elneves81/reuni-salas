@@ -1,7 +1,39 @@
 // ==================== NETLIFY FUNCTION: LOGIN COM GOOGLE CLOUD SQL ====================
 
-const { executeQuery } = require('./db-utils');
+const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
+
+// Configuração direta do banco para garantir funcionamento
+const dbConfig = {
+    host: process.env.DB_HOST || '35.184.206.243',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || 'Neves2025@',
+    database: process.env.DB_NAME || 'reuni-dep',
+    port: parseInt(process.env.DB_PORT) || 3306,
+    ssl: {
+        rejectUnauthorized: false
+    },
+    connectTimeout: 10000,
+    acquireTimeout: 10000,
+    timeout: 10000
+};
+
+// Função para executar queries
+async function executeQuery(query, params = []) {
+    let connection;
+    try {
+        connection = await mysql.createConnection(dbConfig);
+        const [rows] = await connection.execute(query, params);
+        return rows;
+    } catch (error) {
+        console.error('❌ Erro na query:', error.message);
+        throw error;
+    } finally {
+        if (connection) {
+            await connection.end();
+        }
+    }
+}
 
 exports.handler = async (event, context) => {
     // Configurar CORS

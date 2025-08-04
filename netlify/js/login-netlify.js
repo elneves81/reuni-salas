@@ -324,7 +324,7 @@ function renderGoogleButtons() {
             text: 'signin_with',
             shape: 'rectangular',
             logo_alignment: 'left',
-            width: '100%'
+            width: 300
         });
     }
     
@@ -341,7 +341,7 @@ function renderGoogleButtons() {
             text: 'signup_with',
             shape: 'rectangular',
             logo_alignment: 'left',
-            width: '100%'
+            width: 300
         });
     }
 }
