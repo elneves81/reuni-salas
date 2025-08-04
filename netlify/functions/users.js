@@ -66,10 +66,10 @@ async function getUsers() {
     try {
         const users = await executeQuery(`
             SELECT 
-                id, name, email, role, department, status, 
-                created_at, updated_at, last_access
+                id, name, email, role, department, active as status, 
+                created_at, updated_at, last_login as last_access
             FROM users 
-            WHERE status = 'active'
+            WHERE active = TRUE
             ORDER BY created_at DESC
         `);
 
@@ -88,10 +88,10 @@ async function getUser(id) {
     try {
         const users = await executeQuery(`
             SELECT 
-                id, name, email, role, department, status, 
-                created_at, updated_at, last_access
+                id, name, email, role, department, active as status, 
+                created_at, updated_at, last_login as last_access
             FROM users 
-            WHERE id = ? AND status = 'active'
+            WHERE id = ? AND active = TRUE
         `, [id]);
 
         if (users.length === 0) {
