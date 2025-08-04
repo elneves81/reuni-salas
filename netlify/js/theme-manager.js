@@ -67,6 +67,12 @@ class ThemeManager {
     }
 
     createThemeToggle() {
+        // Verificar se já existe
+        const existingToggle = document.querySelector('.theme-toggle-container');
+        if (existingToggle) {
+            existingToggle.remove();
+        }
+
         // Adicionar botão de tema no header
         const themeToggle = document.createElement('div');
         themeToggle.className = 'theme-toggle-container';
@@ -74,16 +80,16 @@ class ThemeManager {
             <button class="theme-toggle-btn" id="themeToggleBtn" title="Alterar Tema">
                 <i class="fas ${this.themes[this.currentTheme].icon}"></i>
             </button>
-            <div class="theme-dropdown" id="themeDropdown">
-                <div class="theme-option" data-theme="light">
+            <div class="theme-dropdown" id="themeDropdown" style="display: none;">
+                <div class="theme-option ${this.currentTheme === 'light' ? 'active' : ''}" data-theme="light">
                     <i class="fas fa-sun"></i>
                     <span>Claro</span>
                 </div>
-                <div class="theme-option" data-theme="dark">
+                <div class="theme-option ${this.currentTheme === 'dark' ? 'active' : ''}" data-theme="dark">
                     <i class="fas fa-moon"></i>
                     <span>Escuro</span>
                 </div>
-                <div class="theme-option" data-theme="auto">
+                <div class="theme-option ${this.currentTheme === 'auto' ? 'active' : ''}" data-theme="auto">
                     <i class="fas fa-adjust"></i>
                     <span>Automático</span>
                 </div>
@@ -103,15 +109,28 @@ class ThemeManager {
         const toggleBtn = document.getElementById('themeToggleBtn');
         const dropdown = document.getElementById('themeDropdown');
 
+        if (!toggleBtn || !dropdown) return;
+
         // Toggle dropdown
         toggleBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            dropdown.classList.toggle('open');
+            const isOpen = dropdown.style.display === 'block';
+            
+            if (isOpen) {
+                dropdown.style.display = 'none';
+                dropdown.classList.remove('open');
+            } else {
+                dropdown.style.display = 'block';
+                setTimeout(() => dropdown.classList.add('open'), 10);
+            }
         });
 
         // Fechar dropdown ao clicar fora
-        document.addEventListener('click', () => {
-            dropdown.classList.remove('open');
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.theme-toggle-container')) {
+                dropdown.style.display = 'none';
+                dropdown.classList.remove('open');
+            }
         });
 
         // Seleção de tema
@@ -121,6 +140,7 @@ class ThemeManager {
             if (option) {
                 const theme = option.dataset.theme;
                 this.setTheme(theme);
+                dropdown.style.display = 'none';
                 dropdown.classList.remove('open');
             }
         });
@@ -200,7 +220,9 @@ class ThemeManager {
         const toggleBtn = document.getElementById('themeToggleBtn');
         if (toggleBtn) {
             const icon = toggleBtn.querySelector('i');
-            icon.className = `fas ${this.themes[this.currentTheme].icon}`;
+            if (icon) {
+                icon.className = `fas ${this.themes[this.currentTheme].icon}`;
+            }
             
             // Atualizar opção ativa no dropdown
             document.querySelectorAll('.theme-option').forEach(option => {

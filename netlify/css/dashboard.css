@@ -2085,17 +2085,19 @@ body {
     border-radius: 8px;
     box-shadow: 0 4px 12px var(--shadow-color);
     min-width: 150px;
-    z-index: 1000;
+    z-index: 1001;
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);
     transition: all 0.2s ease;
+    display: none;
 }
 
 .theme-dropdown.open {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
+    display: block;
 }
 
 .theme-option {
@@ -2646,9 +2648,5 @@ body {
     .result-meta {
         flex-direction: column;
         gap: 5px;
-    }
-    
-    .theme-dropdown {
-        right: -50px;
     }
 }
