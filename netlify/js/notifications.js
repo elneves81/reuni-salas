@@ -15,6 +15,12 @@ class NotificationSystem {
     }
 
     createNotificationPanel() {
+        // Remover painel existente se houver
+        const existingPanel = document.getElementById('notificationPanel');
+        if (existingPanel) {
+            existingPanel.remove();
+        }
+
         const panel = document.createElement('div');
         panel.id = 'notificationPanel';
         panel.className = 'notification-panel';
@@ -45,23 +51,42 @@ class NotificationSystem {
             </div>
         `;
         document.body.appendChild(panel);
+        console.log('📋 Painel de notificações criado');
     }
 
     setupEventListeners() {
-        // Botão de notificações no header
-        const notificationBtn = document.getElementById('notificationsBtn');
-        if (notificationBtn) {
-            notificationBtn.addEventListener('click', () => this.togglePanel());
-        }
-
-        // Filtros de notificação
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('filter-btn')) {
-                document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-                e.target.classList.add('active');
-                this.filterNotifications(e.target.dataset.filter);
+        // Aguardar um pouco para garantir que o DOM está completamente carregado
+        setTimeout(() => {
+            // Botão de notificações no header
+            const notificationBtn = document.getElementById('notificationsBtn');
+            console.log('🔔 Botão de notificações encontrado:', notificationBtn);
+            
+            if (notificationBtn) {
+                // Remover listeners existentes
+                notificationBtn.replaceWith(notificationBtn.cloneNode(true));
+                const newNotificationBtn = document.getElementById('notificationsBtn');
+                
+                newNotificationBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('🔔 Clique no sino detectado!');
+                    this.togglePanel();
+                });
+                
+                console.log('✅ Event listener adicionado ao botão de notificações');
+            } else {
+                console.error('❌ Botão de notificações não encontrado!');
             }
-        });
+
+            // Filtros de notificação
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('filter-btn')) {
+                    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    this.filterNotifications(e.target.dataset.filter);
+                }
+            });
+        }, 100);
     }
 
     requestPermission() {
@@ -128,11 +153,32 @@ class NotificationSystem {
     }
 
     togglePanel() {
-        const panel = document.getElementById('notificationPanel');
-        panel.classList.toggle('open');
+        console.log('🔔 Tentando abrir/fechar painel de notificações');
         
-        if (panel.classList.contains('open')) {
+        let panel = document.getElementById('notificationPanel');
+        
+        // Se o painel não existe, criar novamente
+        if (!panel) {
+            console.log('📋 Painel não encontrado, criando...');
+            this.createNotificationPanel();
+            panel = document.getElementById('notificationPanel');
+        }
+        
+        if (!panel) {
+            console.error('❌ Erro: Não foi possível criar o painel');
+            return;
+        }
+        
+        const isOpen = panel.classList.contains('open');
+        console.log('📋 Painel status atual:', isOpen ? 'Aberto' : 'Fechado');
+        
+        if (isOpen) {
+            panel.classList.remove('open');
+            console.log('📋 Painel fechado');
+        } else {
+            panel.classList.add('open');
             this.renderNotifications();
+            console.log('📋 Painel aberto');
         }
     }
 
@@ -280,11 +326,28 @@ class NotificationSystem {
 // Inicializar sistema de notificações
 let notificationSystem;
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('🚀 Inicializando sistema de notificações...');
     notificationSystem = new NotificationSystem();
+    
+    // Função de debug para teste manual
+    window.testNotifications = function() {
+        console.log('🧪 Testando sistema de notificações...');
+        console.log('📋 notificationSystem existe:', !!notificationSystem);
+        
+        const btn = document.getElementById('notificationsBtn');
+        console.log('🔔 Botão encontrado:', !!btn);
+        
+        if (notificationSystem) {
+            notificationSystem.togglePanel();
+        }
+    };
     
     // Adicionar algumas notificações de exemplo
     setTimeout(() => {
+        console.log('📨 Adicionando notificações de exemplo...');
         notificationSystem.notifySystemUpdate('Sistema atualizado com sucesso!');
         notificationSystem.addNotification('info', 'Bem-vindo!', 'Sistema Sala Livre carregado com sucesso');
     }, 2000);
+    
+    console.log('✅ Sistema de notificações inicializado');
 });
