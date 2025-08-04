@@ -281,8 +281,8 @@ function initializeGoogleAuth() {
     // Aguardar o carregamento do Google SDK
     window.onload = function() {
         if (typeof google !== 'undefined' && google.accounts) {
-            // Client ID de demonstração para o domínio salalivre.netlify.app
-            const CLIENT_ID = '123456789-abcdefghijklmnopqrstuvwxyz123456.apps.googleusercontent.com';
+            // SEU Client ID real do Google Cloud Console
+            const CLIENT_ID = '62181412028-hgs2ak8evqikk4uhl2lpv3omtglf4opl.apps.googleusercontent.com';
             
             try {
                 google.accounts.id.initialize({
@@ -368,8 +368,89 @@ function handleGoogleAuthError() {
 }
 
 function handleGoogleAuth(type) {
-    // Usar a nova implementação de simulação
-    simulateGoogleLogin();
+    if (!googleAuth) {
+        showModal('Erro', 'Google Auth não inicializado. Tente recarregar a página.', 'error');
+        return;
+    }
+
+    showLoading();
+    
+    try {
+        // Iniciar o fluxo de login do Google
+        googleAuth.signIn().then(function(googleUser) {
+            console.log('✅ Google Sign-In bem-sucedido');
+            
+            const profile = googleUser.getBasicProfile();
+            const authResponse = googleUser.getAuthResponse();
+            
+            // Preparar dados do usuário
+            const userData = {
+                id: profile.getId(),
+                name: profile.getName(),
+                email: profile.getEmail(),
+                picture: profile.getImageUrl(),
+                given_name: profile.getGivenName(),
+                family_name: profile.getFamilyName()
+            };
+            
+            // Enviar para nossa API
+            processGoogleAuth(authResponse.id_token, userData);
+            
+        }).catch(function(error) {
+            hideLoading();
+            console.error('❌ Erro no Google Sign-In:', error);
+            showModal('Erro', 'Erro ao fazer login com Google. Tente novamente.', 'error');
+        });
+        
+    } catch (error) {
+        hideLoading();
+        console.error('❌ Erro ao iniciar Google Auth:', error);
+        showModal('Erro', 'Erro ao inicializar Google Auth. Tente recarregar a página.', 'error');
+    }
+}
+
+async function processGoogleAuth(googleToken, userData) {
+    try {
+        console.log('🔄 Processando Google Auth no backend...');
+        
+        const response = await fetch(`${API_BASE_URL}/google-auth`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                googleToken: googleToken,
+                userData: userData
+            })
+        });
+
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+            // Salvar dados de autenticação
+            localStorage.setItem('authToken', data.token);
+            localStorage.setItem('userData', JSON.stringify(data.user));
+            
+            hideLoading();
+            showModal('Sucesso!', 
+                `Bem-vindo(a), ${data.user.name}! Login Google realizado com sucesso.`,
+                'success'
+            );
+            
+            // Redirecionar para dashboard após fechar modal
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 2000);
+            
+        } else {
+            throw new Error(data.message || 'Erro no login Google');
+        }
+        
+    } catch (error) {
+        hideLoading();
+        console.error('❌ Erro no processamento Google Auth:', error);
+        showModal('Erro', `Erro: ${error.message}`, 'error');
+    }
 }
 
 function handleGoogleSignInResponse(response) {
@@ -378,10 +459,10 @@ function handleGoogleSignInResponse(response) {
     try {
         // Decodificar o JWT token do Google
         const userData = parseJWT(response.credential);
+        console.log('👤 Dados do Google recebidos:', userData);
         
-        // Para demonstração, simular resposta de sucesso
-        // Em produção, você enviaria para seu servidor backend
-        simulateGoogleAuthSuccess(userData);
+        // Enviar para nossa API do Google Auth
+        processGoogleAuth(response.credential, userData);
         
     } catch (error) {
         hideLoading();
@@ -390,39 +471,46 @@ function handleGoogleSignInResponse(response) {
     }
 }
 
-function simulateGoogleAuthSuccess(userData) {
-    // Simular processamento no servidor
-    setTimeout(() => {
+async function processGoogleAuth(googleToken, userData) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/google-auth`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                googleToken: googleToken,
+                userData: userData
+            })
+        });
+
+        const data = await response.json();
         hideLoading();
-        
-        // Criar dados de usuário simulados
-        const user = {
-            id: Date.now(),
-            name: userData.name || 'Usuário Google',
-            email: userData.email || 'usuario@gmail.com',
-            picture: userData.picture || '',
-            provider: 'google',
-            role: 'user'
-        };
-        
-        // Simular token JWT
-        const token = 'demo_token_' + btoa(JSON.stringify(user));
-        
-        // Salvar dados localmente
-        localStorage.setItem('authToken', token);
-        localStorage.setItem('userData', JSON.stringify(user));
-        
-        showModal('Sucesso!', 
-            `Bem-vindo(a), ${user.name}! Login realizado com sucesso via Google.`,
-            'success'
-        );
-        
-        // Redirecionar para o dashboard
-        setTimeout(() => {
-            window.location.href = 'dashboard.html';
-        }, 2000);
-        
-    }, 1500);
+
+        if (data.success) {
+            // Salvar dados de autenticação
+            localStorage.setItem('authToken', data.token);
+            localStorage.setItem('userData', JSON.stringify(data.user));
+            
+            showModal('Sucesso!', 
+                `Bem-vindo(a), ${data.user.name}! Login Google realizado com sucesso.`,
+                'success'
+            );
+            
+            // Redirecionar após 2 segundos
+            setTimeout(() => {
+                window.location.href = '/dashboard.html';
+            }, 2000);
+            
+        } else {
+            showModal('Erro', data.message || 'Erro no login Google', 'error');
+        }
+
+    } catch (error) {
+        hideLoading();
+        console.error('❌ Erro no Google Auth:', error);
+        showModal('Erro', 'Erro de conexão. Tente novamente.', 'error');
+    }
 }
 
 function parseJWT(token) {

@@ -22,6 +22,18 @@
   status = 200
 
 [[redirects]]
+  # Login padrão
+  from = "/api/login"
+  to = "/.netlify/functions/login"
+  status = 200
+
+[[redirects]]
+  # Google Auth
+  from = "/api/google-auth"
+  to = "/.netlify/functions/google-auth"
+  status = 200
+
+[[redirects]]
   # Usuários API
   from = "/api/users"
   to = "/.netlify/functions/users"
