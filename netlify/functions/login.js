@@ -78,11 +78,12 @@ exports.handler = async (event, context) => {
             };
         }
 
-        // Buscar usuário no banco Google Cloud SQL
+        // Buscar usuário no banco Google Cloud SQL (CORRIGIDO - colunas que existem)
         const users = await executeQuery(`
-            SELECT id, name, email, password, role, department, active, last_login
+            SELECT id, name, email, password, role, google_id
             FROM users 
-            WHERE email = ? AND active = TRUE
+            WHERE email = ?
+            LIMIT 1
         `, [email]);
 
         if (users.length === 0) {
@@ -113,11 +114,6 @@ exports.handler = async (event, context) => {
                 })
             };
         }
-
-        // Atualizar último login
-        await executeQuery(`
-            UPDATE users SET last_login = NOW() WHERE id = ?
-        `, [user.id]);
 
         console.log('✅ Login bem-sucedido:', email);
 

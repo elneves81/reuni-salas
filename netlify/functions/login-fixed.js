@@ -56,7 +56,7 @@ exports.handler = async (event, context) => {
         
         // Buscar usuário
         const [rows] = await connection.execute(
-            'SELECT id, name, email, password, role, status FROM users WHERE email = ? LIMIT 1',
+            'SELECT id, name, email, password, role FROM users WHERE email = ? LIMIT 1',
             [email]
         );
 
@@ -69,15 +69,6 @@ exports.handler = async (event, context) => {
         }
 
         const user = rows[0];
-
-        // Verificar se usuário está ativo
-        if (user.status !== 'active') {
-            return {
-                statusCode: 401,
-                headers,
-                body: JSON.stringify({ error: 'Usuário inativo' })
-            };
-        }
 
         // Verificar senha
         const validPassword = await bcrypt.compare(password, user.password);
