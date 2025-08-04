@@ -1,7 +1,8 @@
 // ==================== NETLIFY FUNCTION: GOOGLE AUTH ====================
 
-const { executeQuery } = require('./db-utils');
+const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -40,11 +41,27 @@ exports.handler = async (event, context) => {
             };
         }
 
-        // Verificar se usuário já existe
-        let users = await executeQuery(`
-            SELECT id, name, email, password, role, department, active, last_login
+        // Configuração do banco
+        const dbConfig = {
+            host: process.env.DB_HOST || '35.184.206.243',
+            user: process.env.DB_USER || 'root',
+            password: process.env.DB_PASSWORD || 'Neves2025@',
+            database: process.env.DB_NAME || 'reuni-dep',
+            port: parseInt(process.env.DB_PORT || '3306'),
+            ssl: false,
+            connectTimeout: 10000,
+            acquireTimeout: 10000
+        };
+
+        // Criar conexão
+        const connection = await mysql.createConnection(dbConfig);
+
+        // Verificar se usuário já existe (COLUNAS CORRETAS)
+        const [users] = await connection.execute(`
+            SELECT id, name, email, password, role, google_id
             FROM users 
-            WHERE email = ? AND active = TRUE
+            WHERE email = ?
+            LIMIT 1
         `, [userData.email]);
 
         let user;
@@ -57,27 +74,25 @@ exports.handler = async (event, context) => {
             const randomPassword = Math.random().toString(36).slice(-12);
             const hashedPassword = await bcrypt.hash(randomPassword, 10);
             
-            const result = await executeQuery(`
-                INSERT INTO users (name, email, password, role, department, active, created_at, google_id) 
-                VALUES (?, ?, ?, ?, ?, ?, NOW(), ?)
+            const [result] = await connection.execute(`
+                INSERT INTO users (name, email, password, role, google_id, created_at) 
+                VALUES (?, ?, ?, ?, ?, NOW())
             `, [
                 userData.name || userData.email.split('@')[0],
                 userData.email,
                 hashedPassword,
                 'user', // Role padrão
-                'geral', // Departamento padrão
-                true,
                 userData.sub || userData.id // Google ID
             ]);
 
             // Buscar usuário criado
-            users = await executeQuery(`
-                SELECT id, name, email, role, department, active
+            const [newUsers] = await connection.execute(`
+                SELECT id, name, email, role, google_id
                 FROM users 
                 WHERE id = ?
             `, [result.insertId]);
             
-            user = users[0];
+            user = newUsers[0];
             console.log('✅ Usuário criado via Google:', user.id);
 
         } else {
@@ -85,21 +100,22 @@ exports.handler = async (event, context) => {
             console.log('✅ Usuário existente logado via Google:', user.id);
         }
 
-        // Atualizar último login
-        await executeQuery(`
-            UPDATE users SET last_login = NOW() WHERE id = ?
-        `, [user.id]);
-
         // Gerar token JWT
-        const token = Buffer.from(JSON.stringify({
-            id: user.id,
-            email: user.email,
-            role: user.role,
-            provider: 'google',
-            timestamp: Date.now()
-        })).toString('base64');
+        const token = jwt.sign(
+            { 
+                id: user.id, 
+                email: user.email, 
+                role: user.role,
+                provider: 'google'
+            },
+            process.env.JWT_SECRET || 'fallback-secret-key-change-in-production',
+            { expiresIn: '24h' }
+        );
 
         console.log('✅ Google Auth bem-sucedido:', userData.email);
+
+        // Fechar conexão
+        await connection.end();
 
         return {
             statusCode: 200,

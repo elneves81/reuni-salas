@@ -136,8 +136,7 @@ exports.handler = async (event, context) => {
                     id: user.id,
                     name: user.name,
                     email: user.email,
-                    role: user.role,
-                    department: user.department
+                    role: user.role
                 }
             })
         };
