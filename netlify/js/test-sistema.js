@@ -47,8 +47,20 @@ async function testeRapidoSistema() {
         console.log('❌ Sistema de notificações não carregado');
     }
     
-    // 4. Verificar calendário (com aguardar)
-    console.log('4. Verificando calendário...');
+    // 4. Verificar sistema de sincronização
+    console.log('4. Verificando sistema de sincronização...');
+    if (window.autoSync) {
+        console.log('✅ Sistema de sincronização automática carregado');
+        const status = window.autoSync.getStatus();
+        console.log('🔄 Status:', status.isRunning ? 'Ativo' : 'Inativo');
+        console.log('⏱️ Intervalo:', status.interval + 's');
+        console.log('🕐 Última sincronização:', status.lastSync || 'Nunca');
+    } else {
+        console.log('❌ Sistema de sincronização não carregado');
+    }
+    
+    // 5. Verificar calendário (com aguardar)
+    console.log('5. Verificando calendário...');
     await waitForCalendar();
     
     console.log('🧪 === FIM DO TESTE ===');

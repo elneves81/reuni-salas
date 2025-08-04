@@ -696,10 +696,17 @@ async function saveEvent(eventData) {
             const response = await window.salaLivreAPI.createBooking(eventData);
             if (response.success) {
                 console.log('✅ Evento salvo na API:', response.data);
+                
                 // Notificar sistema de notificações
                 if (window.notificationSystem) {
                     window.notificationSystem.addNotification('success', 'Calendário', 'Reunião agendada com sucesso!');
                 }
+                
+                // 🔄 SINCRONIZAR COM TODOS OS USUÁRIOS
+                if (window.autoSync) {
+                    await window.autoSync.syncAfterChange('reunião criada', response.data);
+                }
+                
                 return response.data;
             } else {
                 console.error('❌ Erro ao salvar na API:', response.message);
@@ -726,6 +733,12 @@ async function saveEvent(eventData) {
     localStorage.setItem('salalivre_events', JSON.stringify(savedEvents));
     
     console.log('Evento salvo no localStorage. Total de eventos:', savedEvents.length);
+    
+    // 🔄 SINCRONIZAR MESMO NO FALLBACK
+    if (window.autoSync) {
+        await window.autoSync.syncAfterChange('reunião criada (local)', eventData);
+    }
+    
     return eventData;
 }
 
@@ -2189,11 +2202,53 @@ function editBooking(bookingId) {
     showNotification('Funcionalidade de edição em desenvolvimento', 'info');
 }
 
-function deleteBooking(bookingId) {
+async function deleteBooking(bookingId) {
     if (confirm('Tem certeza que deseja excluir esta reserva?')) {
-        bookingsData = bookingsData.filter(b => b.id !== bookingId);
-        renderBookingsTable();
-        showNotification('Reserva excluída com sucesso!', 'success');
+        try {
+            // Se API disponível, deletar via API
+            if (window.salaLivreAPI && window.salaLivreAPI.isAuthenticated()) {
+                const response = await window.salaLivreAPI.deleteBooking(bookingId);
+                if (response.success) {
+                    console.log('✅ Reunião deletada via API');
+                    
+                    // Remover do calendário
+                    const event = window.calendar?.getEventById(bookingId);
+                    if (event) {
+                        event.remove();
+                    }
+                    
+                    showNotification('Reserva excluída com sucesso!', 'success');
+                    
+                    // 🔄 SINCRONIZAR COM TODOS OS USUÁRIOS
+                    if (window.autoSync) {
+                        await window.autoSync.syncAfterChange('reunião excluída', { id: bookingId });
+                    }
+                    
+                    return;
+                }
+            }
+            
+            // Fallback para dados locais
+            bookingsData = bookingsData.filter(b => b.id !== bookingId);
+            renderBookingsTable();
+            
+            // Remover do calendário se existir
+            const event = window.calendar?.getEventById(bookingId);
+            if (event) {
+                event.remove();
+            }
+            
+            showNotification('Reserva excluída com sucesso!', 'success');
+            
+            // 🔄 SINCRONIZAR MESMO NO FALLBACK
+            if (window.autoSync) {
+                await window.autoSync.syncAfterChange('reunião excluída (local)', { id: bookingId });
+            }
+            
+        } catch (error) {
+            console.error('❌ Erro ao excluir reunião:', error);
+            showNotification('Erro ao excluir reserva: ' + error.message, 'error');
+        }
     }
 }
 
