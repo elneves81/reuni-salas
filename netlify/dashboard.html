@@ -4,12 +4,80 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sala Livre - Dashboard Executivo</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Sistema completo de gestão de salas de reunião e reservas">
+    <meta name="keywords" content="reservas, salas, reunião, dashboard, gestão">
+    <meta name="author" content="Sala Livre System">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="msapplication-navbutton-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Sala Livre">
+    <meta name="apple-mobile-web-app-title" content="Sala Livre">
+    
+    <!-- PWA Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="images/icon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/icon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="images/icon-180x180.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="images/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="images/icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="images/icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="images/icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="images/icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="57x57" href="images/icon-57x57.png">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="css/dashboard.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css">
+    
+    <!-- External Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- PWA Registration -->
+    <script>
+        // Registrar Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('SW registrado com sucesso:', registration);
+                    })
+                    .catch(error => {
+                        console.log('Falha ao registrar SW:', error);
+                    });
+            });
+        }
+        
+        // PWA Install Prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Mostrar botão de instalação customizado
+            setTimeout(() => {
+                if (confirm('Deseja instalar o Sala Livre como aplicativo?')) {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('PWA instalado com sucesso');
+                        }
+                        deferredPrompt = null;
+                    });
+                }
+            }, 3000);
+        });
+    </script>
 </head>
 <body>
     <!-- Sidebar -->
@@ -98,14 +166,29 @@
                 <h1 class="page-title" id="pageTitle">Dashboard Executivo</h1>
             </div>
             <div class="header-right">
+                <!-- Busca Global Avançada -->
+                <div class="global-search-container" id="globalSearchContainer">
+                    <!-- Será criado dinamicamente pelo JavaScript -->
+                </div>
+                
                 <div class="header-actions">
+                    <!-- Tema Toggle -->
+                    <div class="theme-toggle-container" id="themeToggleContainer">
+                        <!-- Será criado dinamicamente pelo JavaScript -->
+                    </div>
+                    
+                    <!-- Notificações -->
                     <button class="header-btn" id="notificationsBtn">
                         <i class="fas fa-bell"></i>
-                        <span class="notification-badge">3</span>
+                        <span class="notification-badge" style="display: none;">0</span>
                     </button>
+                    
+                    <!-- Quick Add -->
                     <button class="header-btn" id="quickAddBtn">
                         <i class="fas fa-plus"></i>
                     </button>
+                    
+                    <!-- User Menu -->
                     <div class="user-menu">
                         <button class="user-menu-toggle" id="userMenuToggle">
                             <div class="user-avatar-small">
@@ -115,7 +198,7 @@
                         </button>
                         <div class="user-menu-dropdown" id="userMenuDropdown">
                             <a href="#"><i class="fas fa-user"></i> Perfil</a>
-                            <a href="#"><i class="fas fa-cog"></i> Configurações</a>
+                            <a href="#" onclick="showSection('settings')"><i class="fas fa-cog"></i> Configurações</a>
                             <hr>
                             <a href="#" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Sair</a>
                         </div>
@@ -621,6 +704,11 @@
         </div>
     </div>
 
+    <!-- Scripts -->
+    <script src="js/notifications.js"></script>
+    <script src="js/theme-manager.js"></script>
+    <script src="js/export-manager.js"></script>
+    <script src="js/global-search.js"></script>
     <script src="js/dashboard.js"></script>
 </body>
 </html>

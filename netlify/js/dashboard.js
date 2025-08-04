@@ -2092,6 +2092,11 @@ function deleteUser(userId) {
         usersData = usersData.filter(u => u.id !== userId);
         renderUsersGrid();
         showNotification('Usuário excluído com sucesso!', 'success');
+        
+        // Notificar sistema avançado se disponível
+        if (typeof notificationSystem !== 'undefined') {
+            notificationSystem.addNotification('user', 'Usuário Removido', `Usuário excluído do sistema`);
+        }
     }
 }
 
@@ -2101,3 +2106,152 @@ function viewUserDetails(userId) {
         showNotification(`Visualizando detalhes de: ${user.name}`, 'info');
     }
 }
+
+// ==================== INTEGRAÇÃO COM SISTEMAS AVANÇADOS ====================
+
+// Integrar notificações avançadas com ações do sistema
+function integrateAdvancedSystems() {
+    console.log('🔗 Integrando sistemas avançados...');
+    
+    // Override da função showNotification para usar sistema avançado
+    const originalShowNotification = window.showNotification;
+    window.showNotification = function(message, type = 'info') {
+        // Usar sistema avançado se disponível
+        if (typeof notificationSystem !== 'undefined') {
+            notificationSystem.addNotification(type, 'Sistema', message);
+        } else {
+            // Fallback para sistema original
+            originalShowNotification(message, type);
+        }
+    };
+    
+    // Integrar com eventos de reserva
+    window.addEventListener('bookingCreated', (event) => {
+        if (typeof notificationSystem !== 'undefined') {
+            notificationSystem.notifyNewBooking(event.detail);
+        }
+    });
+    
+    window.addEventListener('bookingCancelled', (event) => {
+        if (typeof notificationSystem !== 'undefined') {
+            notificationSystem.notifyBookingCancelled(event.detail);
+        }
+    });
+    
+    // Integrar tema com gráficos
+    window.addEventListener('themeChanged', (event) => {
+        updateChartsTheme(event.detail.theme);
+    });
+    
+    console.log('✅ Sistemas avançados integrados');
+}
+
+// Atualizar tema dos gráficos
+function updateChartsTheme(theme) {
+    if (!window.themeManager) return;
+    
+    const isDark = themeManager.isDarkMode();
+    const colors = themeManager.getThemeColors();
+    
+    // Atualizar cores dos gráficos existentes
+    Object.values(charts).forEach(chart => {
+        if (chart && chart.options) {
+            // Atualizar cores do texto
+            if (chart.options.plugins && chart.options.plugins.legend) {
+                chart.options.plugins.legend.labels.color = colors['--text-primary'];
+            }
+            
+            // Atualizar cores dos eixos
+            if (chart.options.scales) {
+                Object.values(chart.options.scales).forEach(scale => {
+                    if (scale.ticks) scale.ticks.color = colors['--text-secondary'];
+                    if (scale.grid) scale.grid.color = colors['--border-color'];
+                });
+            }
+            
+            chart.update();
+        }
+    });
+}
+
+// Enhanced event dispatching
+function dispatchBookingEvent(type, bookingData) {
+    const event = new CustomEvent(type, { 
+        detail: bookingData,
+        bubbles: true 
+    });
+    window.dispatchEvent(event);
+}
+
+// Keyboard shortcuts enhancement
+document.addEventListener('keydown', (e) => {
+    // Ctrl+Shift+N: Nova reserva rápida
+    if (e.ctrlKey && e.shiftKey && e.key === 'N') {
+        e.preventDefault();
+        showSection('calendar');
+        // Abrir modal de nova reserva se existir
+        setTimeout(() => {
+            const addBtn = document.querySelector('[onclick*="addEvent"]');
+            if (addBtn) addBtn.click();
+        }, 500);
+    }
+    
+    // Ctrl+Shift+E: Exportar dados
+    if (e.ctrlKey && e.shiftKey && e.key === 'E') {
+        e.preventDefault();
+        if (typeof exportManager !== 'undefined') {
+            exportManager.openModal();
+        }
+    }
+    
+    // Ctrl+Shift+T: Alternar tema
+    if (e.ctrlKey && e.shiftKey && e.key === 'T') {
+        e.preventDefault();
+        if (typeof themeManager !== 'undefined') {
+            const currentTheme = themeManager.getCurrentTheme();
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            themeManager.setTheme(newTheme);
+        }
+    }
+});
+
+// Integração com PWA
+function setupPWAIntegration() {
+    // Verificar se está rodando como PWA
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        document.body.classList.add('pwa-mode');
+        console.log('🔱 Rodando como PWA');
+        
+        // Notificar sobre modo PWA
+        setTimeout(() => {
+            if (typeof notificationSystem !== 'undefined') {
+                notificationSystem.addNotification('success', 'PWA Ativo', 'Aplicativo instalado e funcionando offline!');
+            }
+        }, 3000);
+    }
+    
+    // Verificar status da conexão
+    function updateOnlineStatus() {
+        const isOnline = navigator.onLine;
+        document.body.classList.toggle('offline', !isOnline);
+        
+        if (typeof notificationSystem !== 'undefined') {
+            if (!isOnline) {
+                notificationSystem.addNotification('warning', 'Offline', 'Modo offline ativado. Dados serão sincronizados quando a conexão retornar.');
+            } else {
+                notificationSystem.addNotification('success', 'Online', 'Conexão restaurada. Sincronizando dados...');
+            }
+        }
+    }
+    
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+}
+
+// Inicializar integrações quando sistemas estiverem prontos
+setTimeout(() => {
+    integrateAdvancedSystems();
+    setupPWAIntegration();
+}, 2000);
+
+console.log('🎯 Dashboard Sala Livre carregado com todas as melhorias!');
