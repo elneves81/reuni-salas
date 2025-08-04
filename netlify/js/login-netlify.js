@@ -311,42 +311,39 @@ function initializeGoogleAuth() {
 }
 
 function renderGoogleButtons() {
-    // Renderizar botão de login
+    // Renderizar botão de login usando Google Auth real
     const loginButton = document.getElementById('googleSignIn');
     if (loginButton) {
         loginButton.style.display = 'flex';
-        loginButton.onclick = () => {
-            // Para demonstração, simular login bem-sucedido
-            simulateGoogleLogin();
-        };
+        
+        // Usar Google Auth API real
+        google.accounts.id.renderButton(loginButton, {
+            theme: 'outline',
+            size: 'large',
+            type: 'standard',
+            text: 'signin_with',
+            shape: 'rectangular',
+            logo_alignment: 'left',
+            width: '100%'
+        });
     }
     
-    // Renderizar botão de cadastro
+    // Renderizar botão de cadastro usando Google Auth real
     const signUpButton = document.getElementById('googleSignUp');
     if (signUpButton) {
         signUpButton.style.display = 'flex';
-        signUpButton.onclick = () => {
-            // Para demonstração, simular cadastro bem-sucedido
-            simulateGoogleLogin();
-        };
+        
+        // Usar Google Auth API real
+        google.accounts.id.renderButton(signUpButton, {
+            theme: 'outline',
+            size: 'large',
+            type: 'standard',
+            text: 'signup_with',
+            shape: 'rectangular',
+            logo_alignment: 'left',
+            width: '100%'
+        });
     }
-}
-
-function simulateGoogleLogin() {
-    showLoading();
-    
-    // Simular dados do Google
-    const userData = {
-        name: 'Usuário Demo',
-        email: 'demo@salalivre.com',
-        picture: 'https://via.placeholder.com/40?text=U',
-        given_name: 'Usuário',
-        family_name: 'Demo'
-    };
-    
-    setTimeout(() => {
-        simulateGoogleAuthSuccess(userData);
-    }, 1500);
 }
 
 function handleGoogleAuthError() {
